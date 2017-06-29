@@ -1,0 +1,7 @@
+.yarnclean
+/.idea/vcs.xml
+/.idea/workspace.xml
+/bower_components
+/dist
+/node_modules
+/npm-debug.log*

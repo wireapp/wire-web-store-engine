@@ -1,0 +1,29 @@
+{
+  "author": "Wire",
+  "dependencies": {
+    "@types/node": "8.0.3"
+  },
+  "devDependencies": {
+    "jasmine": "2.6.0",
+    "typescript": "2.3.4"
+  },
+  "description": "Provider for different storage engines.",
+  "license": "GPL-3.0",
+  "main": "./dist/commonjs/index.js",
+  "name": "@wireapp/store-engine",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wireapp/wire-web-store-engine.git"
+  },
+  "scripts": {
+    "clean": "rimraf dist/commonjs",
+    "dist": "yarn clean && tsc",
+    "postversion": "git push && git push --tags",
+    "preversion": "yarn && yarn dist && yarn test",
+    "version": "yarn dist",
+    "test": "yarn clean && yarn dist && yarn test:node",
+    "test:node": "jasmine"
+  },
+  "types": "./dist/commonjs/index.d.ts",
+  "version": "0.0.0"
+}

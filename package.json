@@ -1,11 +1,19 @@
 {
   "author": "Wire",
   "dependencies": {
-    "@types/node": "8.0.3"
+    "@types/node": "8.0.3",
+    "dexie": "1.5.1"
   },
   "devDependencies": {
     "jasmine": "2.6.0",
-    "typescript": "2.3.4"
+    "karma": "1.7.0",
+    "karma-chrome-launcher": "2.2.0",
+    "karma-jasmine": "1.1.0",
+    "karma-jasmine-diff-reporter": "1.1.0",
+    "karma-sourcemap-loader": "0.3.7",
+    "rimraf": "2.6.1",
+    "typescript": "2.3.4",
+    "webpack": "2.6.1"
   },
   "description": "Provider for different storage engines.",
   "license": "GPL-3.0",
@@ -21,8 +29,9 @@
     "postversion": "git push && git push --tags",
     "preversion": "yarn && yarn dist && yarn test",
     "version": "yarn dist",
-    "test": "yarn clean && yarn dist && yarn test:node",
-    "test:node": "jasmine"
+    "test": "yarn dist && yarn test:node && yarn test:browser",
+    "test:node": "jasmine",
+    "test:browser": "webpack && karma start karma.conf.js"
   },
   "types": "./dist/commonjs/index.d.ts",
   "version": "0.0.0"

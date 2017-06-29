@@ -1,8 +1,8 @@
 interface CRUDStore {
-  create(primaryKey: string, entity: any): Promise<string>;
-  delete(primaryKey: string): Promise<string>;
-  deleteAll(): Promise<boolean>;
-  read(primaryKey: string): Promise<any>;
-  readAll(storeName: string): Promise<any[]>;
-  update(primaryKey: string, changes: any): Promise<string>;
+  create(tableName: string, primaryKey: string, entity: any): Promise<string>;
+  delete(tableName: string, primaryKey: string): Promise<string>;
+  deleteAll(tableName: string): Promise<boolean>;
+  read(tableName: string, primaryKey: string): Promise<any>;
+  readAll(tableName: string): Promise<any[]>;
+  update(tableName: string, primaryKey: string, changes: any): Promise<string>;
 }

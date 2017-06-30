@@ -17,11 +17,11 @@
  *
  */
 
-import engine from '../../dist/engine-bundle';
+import {LocalStorageEngine} from '../../dist/commonjs';
 
 describe('LocalStorageEngine', () => {
   const DATABASE_NAME = 'database-name';
-  const lse = new engine.LocalStorageEngine(DATABASE_NAME);
+  const lse = new LocalStorageEngine(DATABASE_NAME);
 
   describe('"create"', () => {
     it('creates a stringified database record.', (done) => {

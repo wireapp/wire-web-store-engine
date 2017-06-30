@@ -24,8 +24,8 @@
     "url": "git+https://github.com/wireapp/wire-web-store-engine.git"
   },
   "scripts": {
-    "clean": "rimraf dist/commonjs",
-    "dist": "yarn clean && tsc",
+    "clear": "rimraf dist",
+    "dist": "yarn clear && tsc",
     "postversion": "git push && git push --tags",
     "preversion": "yarn && yarn dist && yarn test",
     "version": "yarn dist",

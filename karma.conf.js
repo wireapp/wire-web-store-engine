@@ -40,7 +40,7 @@ module.exports = function(config) {
       },
     },
     files: [
-      `${dist}test.js`
+      `${dist}test-bundle.js`
     ],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,

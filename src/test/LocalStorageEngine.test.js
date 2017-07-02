@@ -21,7 +21,11 @@ import {LocalStorageEngine} from '../../dist/commonjs';
 
 describe('LocalStorageEngine', () => {
   const DATABASE_NAME = 'database-name';
-  const lse = new LocalStorageEngine(DATABASE_NAME);
+  let lse = undefined;
+
+  beforeEach(() => {
+    lse = new LocalStorageEngine(DATABASE_NAME);
+  });
 
   describe('"create"', () => {
     it('creates a stringified database record.', (done) => {
@@ -36,6 +40,65 @@ describe('LocalStorageEngine', () => {
         return lse.read(TABLE_NAME, primaryKey);
       }).then((entity) => {
         expect(entity.some).toBe('value');
+        done();
+      });
+    });
+  });
+
+  describe('"delete"', () => {
+    it('returns the primary key of a deleted record.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      lse.create(TABLE_NAME, PRIMARY_KEY, entity).then((primaryKey) => {
+        return lse.delete(TABLE_NAME, primaryKey);
+      }).then((primaryKey) => {
+        expect(primaryKey).toBe(PRIMARY_KEY);
+        done();
+      });
+    });
+  });
+
+  describe('"deleteAll"', () => {
+    it('deletes all records from a database table.', (done) => {
+      const TABLE_NAME = 'table-name';
+
+      const firstPayload = {
+        primaryKey: 'primary-key-1',
+        entity: {
+          value: 72
+        }
+      };
+
+      const secondPayload = {
+        primaryKey: 'primary-key-2',
+        entity: {
+          value: 73
+        }
+      };
+
+      const thirdPayload = {
+        primaryKey: 'primary-key-3',
+        entity: {
+          value: 'ABC'
+        }
+      };
+
+      Promise.all([
+        lse.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
+        lse.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
+        lse.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
+      ]).then(() => {
+        return lse.deleteAll(TABLE_NAME);
+      }).then((hasBeenDeleted) => {
+        expect(hasBeenDeleted).toBe(true);
+        return lse.readAll(TABLE_NAME);
+      }).then((records) => {
+        expect(records.length).toBe(0);
         done();
       });
     });

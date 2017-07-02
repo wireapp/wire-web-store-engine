@@ -13,7 +13,7 @@ export default class LocalStorageEngine implements CRUDStore {
     });
   }
 
-  delete(primaryKey: string, tableName: string): Promise<string> {
+  delete(tableName: string, primaryKey: string): Promise<string> {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       window.localStorage.removeItem(key);

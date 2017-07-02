@@ -21,10 +21,10 @@ import {LocalStorageEngine} from '../../dist/commonjs/engine';
 
 describe('engine.LocalStorageEngine', () => {
   const DATABASE_NAME = 'database-name';
-  let lse = undefined;
+  let engine = undefined;
 
   beforeEach(() => {
-    lse = new LocalStorageEngine(DATABASE_NAME);
+    engine = new LocalStorageEngine(DATABASE_NAME);
   });
 
   afterEach(() => {
@@ -40,12 +40,14 @@ describe('engine.LocalStorageEngine', () => {
         some: 'value'
       };
 
-      lse.create(TABLE_NAME, PRIMARY_KEY, entity).then((primaryKey) => {
-        return lse.read(TABLE_NAME, primaryKey);
-      }).then((record) => {
-        expect(record.some).toBe(entity.some);
-        done();
-      });
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then((primaryKey) => {
+          return engine.read(TABLE_NAME, primaryKey);
+        })
+        .then((record) => {
+          expect(record.some).toBe(entity.some);
+          done();
+        });
     });
 
     it('overwrites an existing database record.', (done) => {
@@ -60,12 +62,12 @@ describe('engine.LocalStorageEngine', () => {
         some: 'newer-value'
       };
 
-      lse.create(TABLE_NAME, PRIMARY_KEY, firstEntity)
+      engine.create(TABLE_NAME, PRIMARY_KEY, firstEntity)
         .then(() => {
-          return lse.create(TABLE_NAME, PRIMARY_KEY, secondEntity)
+          return engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity)
         })
         .then((primaryKey) => {
-          return lse.read(TABLE_NAME, primaryKey);
+          return engine.read(TABLE_NAME, primaryKey);
         })
         .then((record) => {
           expect(record.some).toBe(secondEntity.some);
@@ -83,12 +85,14 @@ describe('engine.LocalStorageEngine', () => {
         some: 'value'
       };
 
-      lse.create(TABLE_NAME, PRIMARY_KEY, entity).then((primaryKey) => {
-        return lse.delete(TABLE_NAME, primaryKey);
-      }).then((primaryKey) => {
-        expect(primaryKey).toBe(PRIMARY_KEY);
-        done();
-      });
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then((primaryKey) => {
+          return engine.delete(TABLE_NAME, primaryKey);
+        })
+        .then((primaryKey) => {
+          expect(primaryKey).toBe(PRIMARY_KEY);
+          done();
+        });
     });
   });
 
@@ -118,18 +122,21 @@ describe('engine.LocalStorageEngine', () => {
       };
 
       Promise.all([
-        lse.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
-        lse.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
-        lse.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
-      ]).then(() => {
-        return lse.deleteAll(TABLE_NAME);
-      }).then((hasBeenDeleted) => {
-        expect(hasBeenDeleted).toBe(true);
-        return lse.readAll(TABLE_NAME);
-      }).then((records) => {
-        expect(records.length).toBe(0);
-        done();
-      });
+        engine.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
+        engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
+        engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
+      ])
+        .then(() => {
+          return engine.deleteAll(TABLE_NAME);
+        })
+        .then((hasBeenDeleted) => {
+          expect(hasBeenDeleted).toBe(true);
+          return engine.readAll(TABLE_NAME);
+        })
+        .then((records) => {
+          expect(records.length).toBe(0);
+          done();
+        });
     });
   });
 
@@ -142,12 +149,14 @@ describe('engine.LocalStorageEngine', () => {
         some: 'value'
       };
 
-      lse.create(TABLE_NAME, PRIMARY_KEY, entity).then((primaryKey) => {
-        return lse.read(TABLE_NAME, primaryKey);
-      }).then((record) => {
-        expect(record.some).toBe(entity.some);
-        done();
-      });
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then((primaryKey) => {
+          return engine.read(TABLE_NAME, primaryKey);
+        })
+        .then((record) => {
+          expect(record.some).toBe(entity.some);
+          done();
+        });
     });
   });
 
@@ -177,15 +186,17 @@ describe('engine.LocalStorageEngine', () => {
       };
 
       Promise.all([
-        lse.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
-        lse.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
-        lse.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
-      ]).then(() => {
-        return lse.readAll(TABLE_NAME);
-      }).then((records) => {
-        expect(records.length).toBe(3);
-        done();
-      });
+        engine.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
+        engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
+        engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
+      ])
+        .then(() => {
+          return engine.readAll(TABLE_NAME);
+        })
+        .then((records) => {
+          expect(records.length).toBe(3);
+          done();
+        });
     });
   });
 
@@ -206,18 +217,21 @@ describe('engine.LocalStorageEngine', () => {
         }
       };
 
-      lse.create(TABLE_NAME, PRIMARY_KEY, entity).then(() => {
-        return lse.update(TABLE_NAME, PRIMARY_KEY, updates);
-      }).then((primaryKey) => {
-        return lse.read(TABLE_NAME, primaryKey);
-      }).then((updatedRecord) => {
-        expect(updatedRecord.name).toBe(entity.name);
-        expect(updatedRecord.age).toBe(updates.age);
-        expect(Object.keys(updatedRecord.size).length).toBe(2);
-        expect(updatedRecord.size.height).toBe(updates.size.height);
-        expect(updatedRecord.size.width).toBe(updates.size.width);
-        done();
-      });
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then(() => {
+          return engine.update(TABLE_NAME, PRIMARY_KEY, updates);
+        })
+        .then((primaryKey) => {
+          return engine.read(TABLE_NAME, primaryKey);
+        })
+        .then((updatedRecord) => {
+          expect(updatedRecord.name).toBe(entity.name);
+          expect(updatedRecord.age).toBe(updates.age);
+          expect(Object.keys(updatedRecord.size).length).toBe(2);
+          expect(updatedRecord.size.height).toBe(updates.size.height);
+          expect(updatedRecord.size.width).toBe(updates.size.width);
+          done();
+        });
     });
   });
 });

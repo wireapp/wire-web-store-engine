@@ -47,6 +47,31 @@ describe('engine.LocalStorageEngine', () => {
         done();
       });
     });
+
+    it('overwrites an existing database record.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      const firstEntity = {
+        some: 'value'
+      };
+
+      const secondEntity = {
+        some: 'newer-value'
+      };
+
+      lse.create(TABLE_NAME, PRIMARY_KEY, firstEntity)
+        .then(() => {
+          return lse.create(TABLE_NAME, PRIMARY_KEY, secondEntity)
+        })
+        .then((primaryKey) => {
+          return lse.read(TABLE_NAME, primaryKey);
+        })
+        .then((record) => {
+          expect(record.some).toBe(secondEntity.some);
+          done();
+        });
+    });
   });
 
   describe('"delete"', () => {

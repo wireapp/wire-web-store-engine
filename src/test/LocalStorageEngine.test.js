@@ -27,8 +27,12 @@ describe('LocalStorageEngine', () => {
     lse = new LocalStorageEngine(DATABASE_NAME);
   });
 
+  afterEach(() => {
+    window.localStorage.clear();
+  });
+
   describe('"create"', () => {
-    it('creates a stringified database record.', (done) => {
+    it('creates a serialized database record.', (done) => {
       const TABLE_NAME = 'table-name';
       const PRIMARY_KEY = 'primary-key';
 
@@ -99,6 +103,62 @@ describe('LocalStorageEngine', () => {
         return lse.readAll(TABLE_NAME);
       }).then((records) => {
         expect(records.length).toBe(0);
+        done();
+      });
+    });
+  });
+
+  describe('"read"', () => {
+    it('returns a database record.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      lse.create(TABLE_NAME, PRIMARY_KEY, entity).then((primaryKey) => {
+        return lse.read(TABLE_NAME, primaryKey);
+      }).then((entity) => {
+        expect(entity.some).toBe('value');
+        done();
+      });
+    });
+  });
+
+  describe('"readAll"', () => {
+    it('returns multiple database records.', (done) => {
+      const TABLE_NAME = 'table-name';
+
+      const firstPayload = {
+        primaryKey: 'primary-key-1',
+        entity: {
+          value: 72
+        }
+      };
+
+      const secondPayload = {
+        primaryKey: 'primary-key-2',
+        entity: {
+          value: 73
+        }
+      };
+
+      const thirdPayload = {
+        primaryKey: 'primary-key-3',
+        entity: {
+          value: 'ABC'
+        }
+      };
+
+      Promise.all([
+        lse.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
+        lse.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
+        lse.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
+      ]).then(() => {
+        return lse.readAll(TABLE_NAME);
+      }).then((records) => {
+        expect(records.length).toBe(3);
         done();
       });
     });

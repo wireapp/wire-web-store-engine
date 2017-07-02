@@ -3,7 +3,7 @@ export default class LocalStorageEngine implements CRUDEngine {
   constructor(private storeName: string) {
   }
 
-  create(tableName: string, primaryKey: string, entity: any): Promise<string> {
+  public create(tableName: string, primaryKey: string, entity: any): Promise<string> {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       window.localStorage.setItem(key, JSON.stringify(entity));
@@ -11,7 +11,7 @@ export default class LocalStorageEngine implements CRUDEngine {
     });
   }
 
-  delete(tableName: string, primaryKey: string): Promise<string> {
+  public delete(tableName: string, primaryKey: string): Promise<string> {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       window.localStorage.removeItem(key);
@@ -19,7 +19,7 @@ export default class LocalStorageEngine implements CRUDEngine {
     });
   }
 
-  deleteAll(tableName: string): Promise<boolean> {
+  public deleteAll(tableName: string): Promise<boolean> {
     return Promise.resolve().then(() => {
       Object.keys(localStorage).forEach((key: string) => {
         const prefix: string = `${this.storeName}@${tableName}@`;
@@ -31,14 +31,14 @@ export default class LocalStorageEngine implements CRUDEngine {
     });
   }
 
-  read(tableName: string, primaryKey: string): Promise<any> {
+  public read(tableName: string, primaryKey: string): Promise<any> {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       return JSON.parse(window.localStorage.getItem(key));
     });
   }
 
-  readAll(tableName: string): Promise<any[]> {
+  public readAll(tableName: string): Promise<any[]> {
     const promises: Array<Promise<string>> = [];
 
     Object.keys(localStorage).forEach((key: string) => {
@@ -51,7 +51,7 @@ export default class LocalStorageEngine implements CRUDEngine {
     return Promise.all(promises);
   }
 
-  update(tableName: string, primaryKey: string, changes: any): Promise<string> {
+  public update(tableName: string, primaryKey: string, changes: any): Promise<string> {
     return this.read(tableName, primaryKey).then((entity: any) => {
       return Object.assign(entity, changes);
     }).then((updatedEntity: any) => {

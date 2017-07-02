@@ -1,4 +1,4 @@
-export default class LocalStorageEngine implements CRUDStore {
+export default class LocalStorageEngine implements CRUDEngine {
   private storeName: string;
 
   constructor(storeName: string) {

@@ -1,6 +1,6 @@
 import Dexie from 'dexie';
 
-export default class IndexedDBEngine implements CRUDStore {
+export default class IndexedDBEngine implements CRUDEngine {
   private db: Dexie;
   private storeName: string;
 

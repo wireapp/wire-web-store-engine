@@ -1,4 +1,4 @@
-interface CRUDStore {
+interface CRUDEngine {
   create(tableName: string, primaryKey: string, entity: any): Promise<string>;
   delete(tableName: string, primaryKey: string): Promise<string>;
   deleteAll(tableName: string): Promise<boolean>;

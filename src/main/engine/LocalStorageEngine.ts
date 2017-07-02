@@ -9,7 +9,7 @@ export default class LocalStorageEngine implements CRUDStore {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       window.localStorage.setItem(key, JSON.stringify(entity));
-      return key;
+      return primaryKey;
     });
   }
 
@@ -17,7 +17,7 @@ export default class LocalStorageEngine implements CRUDStore {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       window.localStorage.removeItem(key);
-      return key;
+      return primaryKey;
     });
   }
 

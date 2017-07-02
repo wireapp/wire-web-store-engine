@@ -1,5 +1,5 @@
 export default class InMemoryEngine implements CRUDEngine {
-  private stores: Object = {};
+  private stores: { [index: string]: { [index: string]: any } } = {};
 
   constructor(private storeName: string) {
     this.stores[storeName] = {};
@@ -11,7 +11,7 @@ export default class InMemoryEngine implements CRUDEngine {
     }
   }
 
-  public create(tableName: string, primaryKey: string, entity: any): Promise<string> {
+  public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     this.prepareTable(tableName);
     return Promise.resolve().then(() => {
       this.stores[this.storeName][tableName][primaryKey] = entity;
@@ -34,16 +34,16 @@ export default class InMemoryEngine implements CRUDEngine {
     });
   }
 
-  public read(tableName: string, primaryKey: string): Promise<any> {
+  public read<T>(tableName: string, primaryKey: string): Promise<T> {
     this.prepareTable(tableName);
     return Promise.resolve().then(() => {
       return this.stores[this.storeName][tableName][primaryKey];
     });
   }
 
-  public readAll(tableName: string): Promise<any[]> {
+  public readAll<T>(tableName: string): Promise<T[]> {
     this.prepareTable(tableName);
-    const promises: Array<Promise<string>> = [];
+    const promises: Array<Promise<T>> = [];
 
     for (let primaryKey of Object.keys(this.stores[this.storeName][tableName])) {
       promises.push(this.read(tableName, primaryKey));
@@ -52,11 +52,16 @@ export default class InMemoryEngine implements CRUDEngine {
     return Promise.all(promises);
   }
 
-  public update(tableName: string, primaryKey: string, changes: any): Promise<string> {
+  public readAllPrimaryKeys(tableName: string): Promise<string[]> {
     this.prepareTable(tableName);
-    return this.read(tableName, primaryKey).then((entity: any) => {
+    return Promise.resolve(Object.keys(this.stores[this.storeName][tableName]));
+  }
+
+  public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+    this.prepareTable(tableName);
+    return this.read(tableName, primaryKey).then((entity: Object) => {
       return Object.assign(entity, changes);
-    }).then((updatedEntity: any) => {
+    }).then((updatedEntity: Object) => {
       return this.create(tableName, primaryKey, updatedEntity);
     });
   }

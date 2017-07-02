@@ -3,7 +3,7 @@ export default class LocalStorageEngine implements CRUDEngine {
   constructor(private storeName: string) {
   }
 
-  public create(tableName: string, primaryKey: string, entity: any): Promise<string> {
+  public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       window.localStorage.setItem(key, JSON.stringify(entity));
@@ -31,15 +31,15 @@ export default class LocalStorageEngine implements CRUDEngine {
     });
   }
 
-  public read(tableName: string, primaryKey: string): Promise<any> {
+  public read<T>(tableName: string, primaryKey: string): Promise<T> {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
-      return JSON.parse(window.localStorage.getItem(key));
+      return JSON.parse(window.localStorage.getItem(key)) || undefined;
     });
   }
 
-  public readAll(tableName: string): Promise<any[]> {
-    const promises: Array<Promise<string>> = [];
+  public readAll<T>(tableName: string): Promise<T[]> {
+    const promises: Array<Promise<T>> = [];
 
     Object.keys(localStorage).forEach((key: string) => {
       const prefix: string = `${this.storeName}@${tableName}@`;
@@ -51,10 +51,23 @@ export default class LocalStorageEngine implements CRUDEngine {
     return Promise.all(promises);
   }
 
-  public update(tableName: string, primaryKey: string, changes: any): Promise<string> {
-    return this.read(tableName, primaryKey).then((entity: any) => {
+  public readAllPrimaryKeys(tableName: string): Promise<string[]> {
+    const primaryKeys: Array<string> = [];
+
+    Object.keys(localStorage).forEach((primaryKey: string) => {
+      const prefix: string = `${this.storeName}@${tableName}@`;
+      if (primaryKey.startsWith(prefix)) {
+        primaryKeys.push(primaryKey.replace(prefix, ''));
+      }
+    });
+
+    return Promise.resolve(primaryKeys);
+  }
+
+  public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+    return this.read(tableName, primaryKey).then((entity: Object) => {
       return Object.assign(entity, changes);
-    }).then((updatedEntity: any) => {
+    }).then((updatedEntity: Object) => {
       return this.create(tableName, primaryKey, updatedEntity);
     });
   }

@@ -42,8 +42,8 @@ describe('LocalStorageEngine', () => {
 
       lse.create(TABLE_NAME, PRIMARY_KEY, entity).then((primaryKey) => {
         return lse.read(TABLE_NAME, primaryKey);
-      }).then((entity) => {
-        expect(entity.some).toBe('value');
+      }).then((record) => {
+        expect(record.some).toBe(entity.some);
         done();
       });
     });
@@ -119,8 +119,8 @@ describe('LocalStorageEngine', () => {
 
       lse.create(TABLE_NAME, PRIMARY_KEY, entity).then((primaryKey) => {
         return lse.read(TABLE_NAME, primaryKey);
-      }).then((entity) => {
-        expect(entity.some).toBe('value');
+      }).then((record) => {
+        expect(record.some).toBe(entity.some);
         done();
       });
     });
@@ -159,6 +159,38 @@ describe('LocalStorageEngine', () => {
         return lse.readAll(TABLE_NAME);
       }).then((records) => {
         expect(records.length).toBe(3);
+        done();
+      });
+    });
+  });
+
+  describe('"update"', () => {
+    it('updates an existing database record.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        name: 'Old monitor'
+      };
+
+      const updates = {
+        age: 177,
+        size: {
+          height: 1080,
+          width: 1920
+        }
+      };
+
+      lse.create(TABLE_NAME, PRIMARY_KEY, entity).then(() => {
+        return lse.update(TABLE_NAME, PRIMARY_KEY, updates);
+      }).then((primaryKey) => {
+        return lse.read(TABLE_NAME, primaryKey);
+      }).then((updatedRecord) => {
+        expect(updatedRecord.name).toBe(entity.name);
+        expect(updatedRecord.age).toBe(updates.age);
+        expect(Object.keys(updatedRecord.size).length).toBe(2);
+        expect(updatedRecord.size.height).toBe(updates.size.height);
+        expect(updatedRecord.size.width).toBe(updates.size.width);
         done();
       });
     });

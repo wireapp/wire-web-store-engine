@@ -1,8 +1,6 @@
 export default class LocalStorageEngine implements CRUDEngine {
-  private storeName: string;
 
-  constructor(storeName: string) {
-    this.storeName = storeName;
+  constructor(private storeName: string) {
   }
 
   create(tableName: string, primaryKey: string, entity: any): Promise<string> {

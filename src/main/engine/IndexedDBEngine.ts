@@ -2,10 +2,8 @@ import Dexie from 'dexie';
 
 export default class IndexedDBEngine implements CRUDEngine {
   private db: Dexie;
-  private storeName: string;
 
   constructor(storeName: string) {
-    this.storeName = storeName;
     this.db = new Dexie(storeName);
   }
 
@@ -38,7 +36,7 @@ export default class IndexedDBEngine implements CRUDEngine {
   }
 
   update(tableName: string, primaryKey: string, changes: any): Promise<string> {
-    return this.db[this.storeName].update(tableName, primaryKey, changes)
+    return this.db[tableName].update(primaryKey, changes)
       .then((updatedRecords: number) => {
         return primaryKey;
       });

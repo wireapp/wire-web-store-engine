@@ -17,9 +17,9 @@
  *
  */
 
-import {LocalStorageEngine} from '../../dist/commonjs';
+import {LocalStorageEngine} from '../../dist/commonjs/engine';
 
-describe('LocalStorageEngine', () => {
+describe('engine.LocalStorageEngine', () => {
   const DATABASE_NAME = 'database-name';
   let lse = undefined;
 

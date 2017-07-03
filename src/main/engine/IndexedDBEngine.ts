@@ -21,7 +21,7 @@ export default class IndexedDBEngine implements CRUDEngine {
     return this.db[tableName].clear().then(() => true);
   }
 
-  public read(tableName: string, primaryKey: string): Promise<any> {
+  public read<T>(tableName: string, primaryKey: string): Promise<T> {
     return this.db[tableName].get(primaryKey);
   }
 

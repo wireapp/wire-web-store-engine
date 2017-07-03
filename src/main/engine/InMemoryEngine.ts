@@ -34,7 +34,7 @@ export default class InMemoryEngine implements CRUDEngine {
     });
   }
 
-  public read(tableName: string, primaryKey: string): Promise<any> {
+  public read<T>(tableName: string, primaryKey: string): Promise<T> {
     this.prepareTable(tableName);
     return Promise.resolve().then(() => {
       return this.stores[this.storeName][tableName][primaryKey];

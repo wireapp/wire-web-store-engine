@@ -31,7 +31,7 @@ export default class LocalStorageEngine implements CRUDEngine {
     });
   }
 
-  public read(tableName: string, primaryKey: string): Promise<any> {
+  public read<T>(tableName: string, primaryKey: string): Promise<T> {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       return JSON.parse(window.localStorage.getItem(key));

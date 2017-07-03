@@ -18,16 +18,29 @@ export default class ExpirationalStore extends EventEmitter {
   }
 
   private init(): void {
+    let cacheKeys: Array<string> = [];
+
     this.store.readAllPrimaryKeys(this.tableName)
-      .then((primaryKeys) => {
+      .then((primaryKeys: Array<string>) => {
+        const readBundles: Array<Promise<Bundle>> = [];
+
         primaryKeys.forEach((primaryKey: string) => {
           const cacheKey: string = this.constructCacheKey(primaryKey);
-          const bundle: any = this.store.read(this.tableName, primaryKey);
+          cacheKeys.push(cacheKey);
+          readBundles.push(this.store.read<Bundle>(this.tableName, primaryKey));
+        });
+
+        return Promise.all(readBundles);
+      })
+      .then((bundles: Array<Bundle>) => {
+        for (let index in bundles) {
+          const bundle = bundles[index];
+          const cacheKey = cacheKeys[index];
+
           this.startTimer(cacheKey, bundle.expires);
           this.bundles[cacheKey] = bundle;
-        });
-      })
-      .catch((err) => console.log(err))
+        }
+      });
   }
 
   private constructCacheKey(primaryKey: string): string {

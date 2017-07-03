@@ -1,8 +1,7 @@
 import {EventEmitter} from 'events';
 
 export default class ExpirationalStore extends EventEmitter {
-  private timeouts = {};
-  private tokens = {};
+  private bundles = {};
 
   public static TOPIC = {
     WILL_EXPIRE: 'will-expire'
@@ -13,34 +12,34 @@ export default class ExpirationalStore extends EventEmitter {
   }
 
   public set(primaryKey: string, entity: any, ttl: number): Promise<any> {
-    return Promise.resolve()
-      .then(() => {
-        return this.saveWithExpiration(primaryKey, entity, ttl);
-      }).then(() => {
-        this.tokens[primaryKey] = entity;
-        return entity;
-      });
-  }
-
-  private saveWithExpiration(primaryKey: string, entity: any, ttl: number): Promise<string> {
-    const expiringPayload = {
-      expires: this.scheduleExpiration(primaryKey, ttl),
-      payload: entity
+    const bundle = {
+      expires: Date.now() + ttl,
+      payload: entity,
     };
 
-    return this.store.create(this.tableName, primaryKey, entity);
+    const cacheKey: string = `${this.tableName}@${primaryKey}`;
+
+    return Promise.all([
+      this.saveInStore(primaryKey, bundle),
+      this.saveInCache(cacheKey, bundle),
+      this.startTimer(cacheKey, ttl),
+    ]).then(() => bundle);
   }
 
-  private scheduleExpiration(primaryKey: string, ttl: number): number {
-    const timeoutID = this.timeouts[primaryKey];
+  private saveInStore(primaryKey: string, bundle: Object): Promise<string> {
+    return this.store.create(this.tableName, primaryKey, bundle);
+  }
+
+  private saveInCache(cacheKey: string, bundle: Object): Object {
+    return this.bundles[cacheKey] = bundle;
+  }
+
+  private startTimer(cacheKey: string, ttl: number): number {
+    const {expires, timeoutID} = this.bundles[cacheKey];
     clearTimeout(timeoutID);
-
-    const expires: number = Date.now() + ttl;
-
     setTimeout(() => {
-      this.emit(ExpirationalStore.TOPIC.WILL_EXPIRE, this.tokens[primaryKey]);
+      this.emit(ExpirationalStore.TOPIC.WILL_EXPIRE, this.bundles[cacheKey]);
     }, ttl);
-
     return expires;
   }
 }

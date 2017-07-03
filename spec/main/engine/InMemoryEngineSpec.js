@@ -1,4 +1,4 @@
-const InMemoryEngine = require('../../../dist/commonjs/engine/index').InMemoryEngine;
+const InMemoryEngine = require('../../../dist/commonjs/engine').InMemoryEngine;
 
 describe('engine.InMemoryEngine', () => {
   const DATABASE_NAME = 'database-name';

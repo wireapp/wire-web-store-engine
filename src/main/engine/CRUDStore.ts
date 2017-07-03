@@ -4,5 +4,6 @@ interface CRUDEngine {
   deleteAll(tableName: string): Promise<boolean>;
   read(tableName: string, primaryKey: string): Promise<any>;
   readAll(tableName: string): Promise<any[]>;
+  readAllPrimaryKeys(tableName: string): Promise<string[]>;
   update(tableName: string, primaryKey: string, changes: any): Promise<string>;
 }

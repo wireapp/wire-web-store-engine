@@ -13,18 +13,12 @@ export default class IndexedDBEngine implements CRUDEngine {
 
   public delete(tableName: string, primaryKey: string): Promise<string> {
     return Promise.resolve()
-      .then(() => {
-        return this.db[tableName].delete(primaryKey);
-      })
-      .then(() => {
-        return primaryKey;
-      });
+      .then(() => this.db[tableName].delete(primaryKey))
+      .then(() => primaryKey);
   }
 
   public deleteAll(tableName: string): Promise<boolean> {
-    return this.db[tableName].clear().then(() => {
-      return true;
-    });
+    return this.db[tableName].clear().then(() => true);
   }
 
   public read(tableName: string, primaryKey: string): Promise<any> {
@@ -35,10 +29,12 @@ export default class IndexedDBEngine implements CRUDEngine {
     return this.db[tableName].toArray();
   }
 
+  public readAllPrimaryKeys(tableName: string): Promise<any[]> {
+    return this.db[tableName].toCollection().keys();
+  }
+
   public update(tableName: string, primaryKey: string, changes: any): Promise<string> {
     return this.db[tableName].update(primaryKey, changes)
-      .then((updatedRecords: number) => {
-        return primaryKey;
-      });
+      .then((updatedRecords: number) => primaryKey);
   }
 }

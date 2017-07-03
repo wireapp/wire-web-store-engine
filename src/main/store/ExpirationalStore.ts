@@ -1,5 +1,10 @@
 import {EventEmitter} from 'events';
 
+export class Bundle {
+  public expires: number;
+  public payload: any;
+}
+
 export default class ExpirationalStore extends EventEmitter {
   private bundles = {};
 
@@ -9,17 +14,35 @@ export default class ExpirationalStore extends EventEmitter {
 
   constructor(private store: CRUDEngine, private tableName: string) {
     super();
+    this.init();
+  }
+
+  private init(): void {
+    this.store.readAllPrimaryKeys(this.tableName)
+      .then((primaryKeys) => {
+        primaryKeys.forEach((primaryKey: string) => {
+          const cacheKey: string = this.constructCacheKey(primaryKey);
+          const bundle: any = this.store.read(this.tableName, primaryKey);
+          this.startTimer(cacheKey, bundle.expires);
+          this.bundles[cacheKey] = bundle;
+        });
+      })
+      .catch((err) => console.log(err))
   }
 
   private constructCacheKey(primaryKey: string): string {
     return `${this.tableName}@${primaryKey}`;
   };
 
-  public get(primaryKey: string): { expires: number, payload: any } {
-    return this.bundles[this.constructCacheKey(primaryKey)];
+  public get(primaryKey: string): Promise<Bundle> {
+    const cacheBundle = this.bundles[this.constructCacheKey(primaryKey)];
+    if (typeof cacheBundle !== 'undefined') {
+      return Promise.resolve(cacheBundle);
+    }
+    return this.store.read(this.tableName, primaryKey);
   }
 
-  public set(primaryKey: string, entity: any, ttl: number): Promise<any> {
+  public set(primaryKey: string, entity: any, ttl: number): Promise<Bundle> {
     const bundle = {
       expires: Date.now() + ttl,
       payload: entity,
@@ -30,7 +53,7 @@ export default class ExpirationalStore extends EventEmitter {
       .then(() => bundle);
   }
 
-  private save(primaryKey: string, bundle: { expires: number, payload: any }): Promise<string> {
+  private save(primaryKey: string, bundle: Bundle): Promise<string> {
     const cacheKey: string = this.constructCacheKey(primaryKey);
 
     return Promise.all([
@@ -39,18 +62,16 @@ export default class ExpirationalStore extends EventEmitter {
     ]).then(() => cacheKey);
   }
 
-  private saveInStore(primaryKey: string, bundle: Object): Promise<string> {
+  private saveInStore(primaryKey: string, bundle: Bundle): Promise<string> {
     return this.store.create(this.tableName, primaryKey, bundle);
   }
 
-  private saveInCache(cacheKey: string, bundle: Object): Object {
+  private saveInCache(cacheKey: string, bundle: Bundle): Object {
     return this.bundles[cacheKey] = bundle;
   }
 
   private delete(cacheKey: string): Promise<string> {
-    const pattern = `${this.tableName}@`;
-    const start = cacheKey.lastIndexOf(pattern) + pattern.length;
-    const primaryKey = cacheKey.substr(start);
+    const primaryKey = cacheKey.replace(`${this.tableName}@`, '');
 
     return Promise.all([
       this.deleteFromStore(primaryKey),
@@ -67,13 +88,19 @@ export default class ExpirationalStore extends EventEmitter {
     return cacheKey;
   }
 
+  private expireEntity(cacheKey: string) {
+    const expiredEntity = Object.assign({}, this.bundles[cacheKey]);
+    this.delete(cacheKey).then((cacheKey) => this.emit(ExpirationalStore.TOPIC.EXPIRED, expiredEntity));
+  }
+
   private startTimer(cacheKey: string, ttl: number): number {
     const {expires, timeoutID} = this.bundles[cacheKey];
-    clearTimeout(timeoutID);
-    setTimeout(() => {
-      const expiredEntity = Object.assign({}, this.bundles[cacheKey]);
-      this.delete(cacheKey).then((cacheKey) => this.emit(ExpirationalStore.TOPIC.EXPIRED, expiredEntity));
-    }, ttl);
+    if (expires < Date.now()) {
+      this.expireEntity(cacheKey);
+    } else {
+      clearTimeout(timeoutID);
+      setTimeout(() => this.expireEntity(cacheKey), ttl);
+    }
     return expires;
   }
 }

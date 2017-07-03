@@ -51,6 +51,19 @@ export default class LocalStorageEngine implements CRUDEngine {
     return Promise.all(promises);
   }
 
+  public readAllPrimaryKeys(tableName: string): Promise<any[]> {
+    const primaryKeys: Array<string> = [];
+
+    Object.keys(localStorage).forEach((primaryKey: string) => {
+      const prefix: string = `${this.storeName}@${tableName}@`;
+      if (primaryKey.startsWith(prefix)) {
+        primaryKeys.push(primaryKey);
+      }
+    });
+
+    return Promise.resolve(primaryKeys);
+  }
+
   public update(tableName: string, primaryKey: string, changes: any): Promise<string> {
     return this.read(tableName, primaryKey).then((entity: any) => {
       return Object.assign(entity, changes);

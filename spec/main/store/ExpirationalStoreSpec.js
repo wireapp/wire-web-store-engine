@@ -15,13 +15,31 @@ describe('store.ExpirationalStore', () => {
       const entity = {
         access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
       };
-      const primaryKey = 'access-token';
+      const primaryKey = 'access-tokens';
       const ttl = 900;
 
       store.set(primaryKey, entity, ttl)
         .then((bundle) => {
           expect(bundle.expires).toEqual(jasmine.any(Number));
           done();
+        })
+        .catch((error) => done.fail(error));
+    });
+  });
+
+  describe('"get"', () => {
+    it('returns a saved record together with it\'s expiration.', (done) => {
+      const entity = {
+        access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
+      };
+      const primaryKey = 'access-tokens';
+      const ttl = 900;
+
+      store.set(primaryKey, entity, ttl)
+        .then(() => {
+          store.get(primaryKey)
+            .then((bundle) => expect(bundle.payload).toEqual(entity))
+            .then(done);
         })
         .catch((error) => done.fail(error));
     });
@@ -35,7 +53,7 @@ describe('store.ExpirationalStore', () => {
       const entity = {
         access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
       };
-      const primaryKey = 'access-token';
+      const primaryKey = 'access-tokens';
       const minuteInMillis = 60000;
 
       store.on(ExpirationalStore.TOPIC.EXPIRED, (bundle) => {
@@ -52,7 +70,7 @@ describe('store.ExpirationalStore', () => {
       const entity = {
         access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
       };
-      const primaryKey = 'access-token';
+      const primaryKey = 'access-tokens';
       const minuteInMillis = 60000;
 
       store.set(primaryKey, entity, minuteInMillis)

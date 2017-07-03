@@ -177,6 +177,46 @@ describe('engine.InMemoryEngine', () => {
     });
   });
 
+  describe('"readAllPrimaryKeys"', () => {
+    it('returns the keys of multiple database records.', (done) => {
+      const TABLE_NAME = 'table-name';
+
+      const firstPayload = {
+        primaryKey: 'primary-key-1',
+        entity: {
+          value: 72
+        }
+      };
+
+      const secondPayload = {
+        primaryKey: 'primary-key-2',
+        entity: {
+          value: 73
+        }
+      };
+
+      const thirdPayload = {
+        primaryKey: 'primary-key-3',
+        entity: {
+          value: 'ABC'
+        }
+      };
+
+      Promise.all([
+        engine.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
+        engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
+        engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
+      ])
+        .then(() => {
+          return engine.readAllPrimaryKeys(TABLE_NAME);
+        })
+        .then((keys) => {
+          expect(keys.length).toBe(3);
+          done();
+        });
+    });
+  });
+
   describe('"update"', () => {
     it('updates an existing database record.', (done) => {
       const TABLE_NAME = 'table-name';

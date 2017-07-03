@@ -1,5 +1,5 @@
 export default class InMemoryEngine implements CRUDEngine {
-  private stores: Object = {};
+  private stores: { [index: string]: { [index: string]: any } } = {};
 
   constructor(private storeName: string) {
     this.stores[storeName] = {};

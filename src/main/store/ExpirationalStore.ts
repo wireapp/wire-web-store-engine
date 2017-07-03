@@ -1,8 +1,8 @@
 import {EventEmitter} from 'events';
 
-export interface Bundle {
-  expires: number;
-  payload: any;
+export class Bundle {
+  public expires: number;
+  public payload: any;
 }
 
 export default class ExpirationalStore extends EventEmitter {
@@ -36,12 +36,14 @@ export default class ExpirationalStore extends EventEmitter {
           const bundle = bundles[index];
           const cacheKey = cacheKeys[index];
 
-          this.startTimer(cacheKey, bundle.expires);
-          this.bundles[cacheKey] = bundle;
+          this.startTimer(cacheKey, bundle.expires)
+            .then(() => {
+              this.bundles[cacheKey] = bundle;
+            });
         }
 
         return bundles;
-      })
+      });
   }
 
   private constructCacheKey(primaryKey: string): string {
@@ -67,8 +69,10 @@ export default class ExpirationalStore extends EventEmitter {
     };
 
     return this.save(primaryKey, bundle)
-      .then((cacheKey: string) => this.startTimer(cacheKey, ttl))
-      .then(() => bundle);
+      .then((cacheKey: string) => {
+        return this.startTimer(cacheKey, ttl)
+          .then(() => bundle)
+      });
   }
 
   private save<Bundle>(primaryKey: string, bundle: Bundle): Promise<string> {
@@ -111,19 +115,20 @@ export default class ExpirationalStore extends EventEmitter {
     this.delete(cacheKey).then((cacheKey) => this.emit(ExpirationalStore.TOPIC.EXPIRED, expiredEntity));
   }
 
-  // TODO: Turn startTimer into a Promise
-  private startTimer(cacheKey: string, ttl: number): void {
+  private startTimer(cacheKey: string, ttl: number): Promise<void> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
-    this.get(primaryKey).then((bundle: Bundle) => {
-      const {expires} = bundle;
+    return this.get(primaryKey)
+      .then((bundle: Bundle) => {
+        const {expires} = bundle;
 
-      if (expires < Date.now()) {
-        this.expireEntity(cacheKey);
-      } else {
-        // TODO: Make use of "timeoutID"
-        // clearTimeout(timeoutID);
-        setTimeout(() => this.expireEntity(cacheKey), ttl);
-      }
-    });
+        if (expires < Date.now()) {
+          this.expireEntity(cacheKey);
+        } else {
+          // TODO: Make use of "timeoutID"
+          // clearTimeout(timeoutID);
+          setTimeout(() => this.expireEntity(cacheKey), ttl);
+          // return timeoutID;
+        }
+      });
   }
 }

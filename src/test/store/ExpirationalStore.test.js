@@ -53,7 +53,7 @@ describe('store.ExpirationalStore', () => {
   });
 
   describe('"init"', () => {
-    fit('initially reads data from persistent storage.', (done) => {
+    it('initially reads data from persistent storage.', (done) => {
       window.localStorage.setItem(`${DATABASE_NAME}@${TABLE_NAME}@123`, JSON.stringify({
         expires: 2 * Date.now(),
         payload: {token: '123'}

@@ -3,10 +3,11 @@ import {EventEmitter} from 'events';
 export class Bundle {
   public expires: number;
   public payload: any;
+  public timeoutID?: number | NodeJS.Timer;
 }
 
 export default class ExpirationalStore extends EventEmitter {
-  private bundles = {};
+  private bundles: { [index: string]: Bundle } = {};
 
   public static TOPIC = {
     EXPIRED: 'expired'
@@ -70,8 +71,12 @@ export default class ExpirationalStore extends EventEmitter {
 
     return this.save(primaryKey, bundle)
       .then((cacheKey: string) => {
-        return this.startTimer(cacheKey, ttl)
-          .then(() => bundle)
+        return Promise.all([cacheKey, this.startTimer(cacheKey, ttl)]);
+      })
+      // TOOD: Use destructuring here
+      .then((result: [string, Bundle]) => {
+        // Save bundle with timeoutID in cache
+        return this.saveInCache(result[0], result[1]);
       });
   }
 
@@ -89,7 +94,7 @@ export default class ExpirationalStore extends EventEmitter {
   }
 
   private saveInCache<Bundle>(cacheKey: string, bundle: Bundle): Bundle {
-    return this.bundles[cacheKey] = bundle;
+    return this.bundles[cacheKey] = (<any>bundle);
   }
 
   private delete(cacheKey: string): Promise<string> {
@@ -115,20 +120,21 @@ export default class ExpirationalStore extends EventEmitter {
     this.delete(cacheKey).then((cacheKey) => this.emit(ExpirationalStore.TOPIC.EXPIRED, expiredEntity));
   }
 
-  private startTimer(cacheKey: string, ttl: number): Promise<void> {
+  private startTimer(cacheKey: string, ttl: number): Promise<Bundle> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
     return this.get(primaryKey)
       .then((bundle: Bundle) => {
-        const {expires} = bundle;
+        const {expires, timeoutID} = bundle;
 
         if (expires < Date.now()) {
           this.expireEntity(cacheKey);
         } else {
-          // TODO: Make use of "timeoutID"
-          // clearTimeout(timeoutID);
-          setTimeout(() => this.expireEntity(cacheKey), ttl);
-          // return timeoutID;
+          clearTimeout((<any>timeoutID));
+          const timeoutObject: number | NodeJS.Timer = setTimeout(() => this.expireEntity(cacheKey), ttl);
+          bundle.timeoutID = timeoutObject;
         }
+
+        return bundle;
       });
   }
 }

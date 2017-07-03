@@ -27,7 +27,7 @@ export default class ExpirationalStore extends EventEmitter {
         primaryKeys.forEach((primaryKey: string) => {
           const cacheKey: string = this.constructCacheKey(primaryKey);
           cacheKeys.push(cacheKey);
-          readBundles.push(this.store.read<Bundle>(this.tableName, primaryKey));
+          readBundles.push(this.store.read(this.tableName, primaryKey));
         });
 
         return Promise.all(readBundles);
@@ -55,7 +55,7 @@ export default class ExpirationalStore extends EventEmitter {
     return this.store.read(this.tableName, primaryKey);
   }
 
-  public set(primaryKey: string, entity: any, ttl: number): Promise<Bundle> {
+  public set<T>(primaryKey: string, entity: T, ttl: number): Promise<Bundle> {
     const bundle = {
       expires: Date.now() + ttl,
       payload: entity,
@@ -66,7 +66,7 @@ export default class ExpirationalStore extends EventEmitter {
       .then(() => bundle);
   }
 
-  private save(primaryKey: string, bundle: Bundle): Promise<string> {
+  private save<Bundle>(primaryKey: string, bundle: Bundle): Promise<string> {
     const cacheKey: string = this.constructCacheKey(primaryKey);
 
     return Promise.all([
@@ -75,11 +75,11 @@ export default class ExpirationalStore extends EventEmitter {
     ]).then(() => cacheKey);
   }
 
-  private saveInStore(primaryKey: string, bundle: Bundle): Promise<string> {
+  private saveInStore<Bundle>(primaryKey: string, bundle: Bundle): Promise<string> {
     return this.store.create(this.tableName, primaryKey, bundle);
   }
 
-  private saveInCache(cacheKey: string, bundle: Bundle): Object {
+  private saveInCache<Bundle>(cacheKey: string, bundle: Bundle): Bundle {
     return this.bundles[cacheKey] = bundle;
   }
 

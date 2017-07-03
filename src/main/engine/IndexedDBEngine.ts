@@ -7,7 +7,7 @@ export default class IndexedDBEngine implements CRUDEngine {
     this.db = new Dexie(storeName);
   }
 
-  public create(tableName: string, primaryKey: string, entity: any): Promise<string> {
+  public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     return this.db[tableName].add(entity, primaryKey);
   }
 
@@ -25,15 +25,15 @@ export default class IndexedDBEngine implements CRUDEngine {
     return this.db[tableName].get(primaryKey);
   }
 
-  public readAll(tableName: string): Promise<any[]> {
+  public readAll<T>(tableName: string): Promise<T[]> {
     return this.db[tableName].toArray();
   }
 
-  public readAllPrimaryKeys(tableName: string): Promise<any[]> {
+  public readAllPrimaryKeys(tableName: string): Promise<string[]> {
     return this.db[tableName].toCollection().keys();
   }
 
-  public update(tableName: string, primaryKey: string, changes: any): Promise<string> {
+  public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     return this.db[tableName].update(primaryKey, changes)
       .then((updatedRecords: number) => primaryKey);
   }

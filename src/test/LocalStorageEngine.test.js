@@ -41,9 +41,7 @@ describe('engine.LocalStorageEngine', () => {
       };
 
       engine.create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then((primaryKey) => {
-          return engine.read(TABLE_NAME, primaryKey);
-        })
+        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
         .then((record) => {
           expect(record.some).toBe(entity.some);
           done();
@@ -63,12 +61,8 @@ describe('engine.LocalStorageEngine', () => {
       };
 
       engine.create(TABLE_NAME, PRIMARY_KEY, firstEntity)
-        .then(() => {
-          return engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity)
-        })
-        .then((primaryKey) => {
-          return engine.read(TABLE_NAME, primaryKey);
-        })
+        .then(() => engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity))
+        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
         .then((record) => {
           expect(record.some).toBe(secondEntity.some);
           done();
@@ -86,9 +80,7 @@ describe('engine.LocalStorageEngine', () => {
       };
 
       engine.create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then((primaryKey) => {
-          return engine.delete(TABLE_NAME, primaryKey);
-        })
+        .then((primaryKey) => engine.delete(TABLE_NAME, primaryKey))
         .then((primaryKey) => {
           expect(primaryKey).toBe(PRIMARY_KEY);
           done();
@@ -126,9 +118,7 @@ describe('engine.LocalStorageEngine', () => {
         engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
         engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
       ])
-        .then(() => {
-          return engine.deleteAll(TABLE_NAME);
-        })
+        .then(() => engine.deleteAll(TABLE_NAME))
         .then((hasBeenDeleted) => {
           expect(hasBeenDeleted).toBe(true);
           return engine.readAll(TABLE_NAME);
@@ -150,9 +140,7 @@ describe('engine.LocalStorageEngine', () => {
       };
 
       engine.create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then((primaryKey) => {
-          return engine.read(TABLE_NAME, primaryKey);
-        })
+        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
         .then((record) => {
           expect(record.some).toBe(entity.some);
           done();
@@ -190,9 +178,7 @@ describe('engine.LocalStorageEngine', () => {
         engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
         engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
       ])
-        .then(() => {
-          return engine.readAll(TABLE_NAME);
-        })
+        .then(() => engine.readAll(TABLE_NAME))
         .then((records) => {
           expect(records.length).toBe(3);
           done();
@@ -218,12 +204,8 @@ describe('engine.LocalStorageEngine', () => {
       };
 
       engine.create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then(() => {
-          return engine.update(TABLE_NAME, PRIMARY_KEY, updates);
-        })
-        .then((primaryKey) => {
-          return engine.read(TABLE_NAME, primaryKey);
-        })
+        .then(() => engine.update(TABLE_NAME, PRIMARY_KEY, updates))
+        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
         .then((updatedRecord) => {
           expect(updatedRecord.name).toBe(entity.name);
           expect(updatedRecord.age).toBe(updates.age);

@@ -1,5 +1,5 @@
-const InMemoryEngine = require('../../../dist/commonjs/engine/index').InMemoryEngine;
-const ExpirationalStore = require('../../../dist/commonjs/store/index').ExpirationalStore;
+import {ExpirationalStore} from '../../../dist/commonjs/store';
+import {InMemoryEngine} from '../../../dist/commonjs/engine';
 
 describe('store.ExpirationalStore', () => {
   let engine = undefined;

@@ -1,13 +1,20 @@
-import {ExpirationalStore} from '../../../dist/commonjs/store';
-import {InMemoryEngine} from '../../../dist/commonjs/engine';
+import {Bundle, ExpirationalStore} from '../../../dist/commonjs/store';
+import {LocalStorageEngine} from '../../../dist/commonjs/engine';
 
 describe('store.ExpirationalStore', () => {
+  const DATABASE_NAME = 'database-name';
+  const TABLE_NAME = 'table-name';
+
   let engine = undefined;
   let store = undefined;
 
   beforeEach(() => {
-    engine = new InMemoryEngine('database-name');
-    store = new ExpirationalStore(engine, 'table-name');
+    engine = new LocalStorageEngine(DATABASE_NAME);
+    store = new ExpirationalStore(engine, TABLE_NAME);
+  });
+
+  afterEach(() => {
+    window.localStorage.clear();
   });
 
   describe('"set"', () => {
@@ -42,6 +49,30 @@ describe('store.ExpirationalStore', () => {
             .then(done);
         })
         .catch((error) => done.fail(error));
+    });
+  });
+
+  describe('"init"', () => {
+    fit('initially reads data from persistent storage.', (done) => {
+      window.localStorage.setItem(`${DATABASE_NAME}@${TABLE_NAME}@123`, JSON.stringify({
+        expires: 2 * Date.now(),
+        payload: {token: '123'}
+      }));
+
+      window.localStorage.setItem(`${DATABASE_NAME}@${TABLE_NAME}@a2c`, JSON.stringify({
+        expires: 2 * Date.now(),
+        payload: {token: 'a2c'}
+      }));
+
+      window.localStorage.setItem(`${DATABASE_NAME}@${TABLE_NAME}@abc`, JSON.stringify({
+        expires: 2 * Date.now(),
+        payload: {token: 'abc'}
+      }));
+
+      store.init().then((bundles) => {
+        expect(bundles.length).toBe(3);
+        done();
+      });
     });
   });
 

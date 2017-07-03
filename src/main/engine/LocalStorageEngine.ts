@@ -34,7 +34,7 @@ export default class LocalStorageEngine implements CRUDEngine {
   public read<T>(tableName: string, primaryKey: string): Promise<T> {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
-      return JSON.parse(window.localStorage.getItem(key));
+      return JSON.parse(window.localStorage.getItem(key)) || undefined;
     });
   }
 
@@ -57,7 +57,7 @@ export default class LocalStorageEngine implements CRUDEngine {
     Object.keys(localStorage).forEach((primaryKey: string) => {
       const prefix: string = `${this.storeName}@${tableName}@`;
       if (primaryKey.startsWith(prefix)) {
-        primaryKeys.push(primaryKey);
+        primaryKeys.push(primaryKey.replace(prefix, ''));
       }
     });
 

@@ -48,12 +48,10 @@ describe('store.TransientStore', () => {
           timeoutID = bundle.timeoutID;
           return store.set(primaryKey, {access_token: 'ABC'}, ttl);
         })
-        .then((bundle) => {
-          expect(bundle.payload.access_token).toBe(entity.access_token);
-          expect(bundle.timeoutID).toBe(timeoutID);
+        .catch((error) => {
+          expect(error).toEqual(jasmine.any(Store.RecordAlreadyExistsError));
           done();
-        })
-        .catch((error) => done.fail(error));
+        });
     });
   });
 

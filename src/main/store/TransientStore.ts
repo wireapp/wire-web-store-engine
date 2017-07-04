@@ -1,6 +1,7 @@
+import RecordAlreadyExistsError from './RecordAlreadyExistsError';
+import TransientBundle from './TransientBundle';
 import {CRUDEngine} from '../engine';
 import {EventEmitter} from 'events';
-import TransientBundle from './TransientBundle';
 
 export default class TransientStore extends EventEmitter {
   private bundles: { [index: string]: TransientBundle } = {};
@@ -10,7 +11,7 @@ export default class TransientStore extends EventEmitter {
     EXPIRED: 'expired'
   };
 
-  constructor(private store: CRUDEngine) {
+  constructor(private engine: CRUDEngine) {
     super();
   }
 
@@ -19,14 +20,14 @@ export default class TransientStore extends EventEmitter {
 
     let cacheKeys: Array<string> = [];
 
-    return this.store.readAllPrimaryKeys(this.tableName)
+    return this.engine.readAllPrimaryKeys(this.tableName)
       .then((primaryKeys: Array<string>) => {
         const readBundles: Array<Promise<TransientBundle>> = [];
 
         primaryKeys.forEach((primaryKey: string) => {
           const cacheKey: string = this.constructCacheKey(primaryKey);
           cacheKeys.push(cacheKey);
-          readBundles.push(this.store.read(this.tableName, primaryKey));
+          readBundles.push(this.engine.read(this.tableName, primaryKey));
         });
 
         return Promise.all(readBundles);
@@ -67,7 +68,7 @@ export default class TransientStore extends EventEmitter {
   }
 
   private getFromStore(primaryKey: string): Promise<TransientBundle> {
-    return this.store.read(this.tableName, primaryKey);
+    return this.engine.read(this.tableName, primaryKey);
   }
 
   public set<T>(primaryKey: string, entity: T, ttl: number): Promise<TransientBundle> {
@@ -76,11 +77,12 @@ export default class TransientStore extends EventEmitter {
       payload: entity,
     };
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       this.getFromCache(primaryKey)
         .then((cachedBundle: TransientBundle) => {
           if (cachedBundle) {
-            resolve(cachedBundle);
+            const message = `Record with primary key "${primaryKey}" already exists in table "${this.tableName}" of database "${this.engine.storeName}".`;
+            reject(new RecordAlreadyExistsError(message));
           } else {
             this.save(primaryKey, bundle)
               .then((cacheKey: string) => {
@@ -105,7 +107,7 @@ export default class TransientStore extends EventEmitter {
   }
 
   private saveInStore<TransientBundle>(primaryKey: string, bundle: TransientBundle): Promise<string> {
-    return this.store.create(this.tableName, primaryKey, bundle);
+    return this.engine.create(this.tableName, primaryKey, bundle);
   }
 
   private saveInCache<TransientBundle>(cacheKey: string, bundle: TransientBundle): TransientBundle {
@@ -122,7 +124,7 @@ export default class TransientStore extends EventEmitter {
   }
 
   private deleteFromStore(primaryKey: string): Promise<string> {
-    return this.store.delete(this.tableName, primaryKey);
+    return this.engine.delete(this.tableName, primaryKey);
   }
 
   private deleteFromCache(cacheKey: string): string {

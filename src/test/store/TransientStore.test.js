@@ -39,6 +39,22 @@ describe('store.TransientStore', () => {
         })
         .catch((error) => done.fail(error));
     });
+
+    it('doesn\'t overwrite an existing record.', (done) => {
+      let timeoutID = undefined;
+
+      store.set(primaryKey, entity, ttl)
+        .then((bundle) => {
+          timeoutID = bundle.timeoutID;
+          return store.set(primaryKey, {access_token: 'ABC'}, ttl);
+        })
+        .then((bundle) => {
+          expect(bundle.payload.access_token).toBe(entity.access_token);
+          expect(bundle.timeoutID).toBe(timeoutID);
+          done();
+        })
+        .catch((error) => done.fail(error));
+    });
   });
 
   describe('"get"', () => {

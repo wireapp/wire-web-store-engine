@@ -8,16 +8,19 @@ export class Bundle {
 
 export default class ExpirationalStore extends EventEmitter {
   private bundles: { [index: string]: Bundle } = {};
+  private tableName: string;
 
   public static TOPIC = {
     EXPIRED: 'expired'
   };
 
-  constructor(private store: CRUDEngine, private tableName: string) {
+  constructor(private store: CRUDEngine) {
     super();
   }
 
-  public init(): Promise<Array<Bundle>> {
+  public init(tableName: string): Promise<Array<Bundle>> {
+    this.tableName = tableName;
+
     let cacheKeys: Array<string> = [];
 
     return this.store.readAllPrimaryKeys(this.tableName)

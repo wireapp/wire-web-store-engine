@@ -8,9 +8,10 @@ describe('store.ExpirationalStore', () => {
   let engine = undefined;
   let store = undefined;
 
-  beforeEach(() => {
+  beforeEach((done) => {
     engine = new LocalStorageEngine(DATABASE_NAME);
-    store = new ExpirationalStore(engine, TABLE_NAME);
+    store = new ExpirationalStore(engine);
+    store.init(TABLE_NAME).then(done);
   });
 
   afterEach(() => {
@@ -96,7 +97,7 @@ describe('store.ExpirationalStore', () => {
         payload: {token: 'abc'}
       }));
 
-      store.init()
+      store.init(TABLE_NAME)
         .then((bundles) => {
           expect(bundles.length).toBe(3);
           done();

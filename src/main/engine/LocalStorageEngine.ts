@@ -1,3 +1,5 @@
+import CRUDEngine from './CRUDEngine';
+
 export default class LocalStorageEngine implements CRUDEngine {
 
   constructor(private storeName: string) {

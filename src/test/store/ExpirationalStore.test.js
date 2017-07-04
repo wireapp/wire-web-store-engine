@@ -66,6 +66,15 @@ describe('store.ExpirationalStore', () => {
         })
         .catch((error) => done.fail(error));
     });
+
+    it('returns a non-existent record as undefined.', (done) => {
+      const primaryKey = 'access@tokens';
+
+      store.get(primaryKey)
+        .then((bundle) => expect(bundle).toBeUndefined())
+        .then(done)
+        .catch((error) => done.fail(error));
+    });
   });
 
   describe('"init"', () => {

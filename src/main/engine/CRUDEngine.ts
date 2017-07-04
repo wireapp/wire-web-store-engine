@@ -7,3 +7,5 @@ interface CRUDEngine {
   readAllPrimaryKeys(tableName: string): Promise<string[]>;
   update(tableName: string, primaryKey: string, changes: Object): Promise<string>;
 }
+
+export default CRUDEngine;

@@ -2,7 +2,7 @@ import CRUDEngine from './CRUDEngine';
 
 export default class LocalStorageEngine implements CRUDEngine {
 
-  constructor(private storeName: string) {
+  constructor(public storeName: string) {
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {

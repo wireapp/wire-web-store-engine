@@ -3,7 +3,7 @@ import CRUDEngine from './CRUDEngine';
 export default class InMemoryEngine implements CRUDEngine {
   private stores: { [index: string]: { [index: string]: any } } = {};
 
-  constructor(private storeName: string) {
+  constructor(public storeName: string) {
     this.stores[storeName] = {};
   }
 

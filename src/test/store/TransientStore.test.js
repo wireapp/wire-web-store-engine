@@ -39,6 +39,20 @@ describe('store.TransientStore', () => {
         })
         .catch((error) => done.fail(error));
     });
+
+    it('doesn\'t overwrite an existing record.', (done) => {
+      let timeoutID = undefined;
+
+      store.set(primaryKey, entity, ttl)
+        .then((bundle) => {
+          timeoutID = bundle.timeoutID;
+          return store.set(primaryKey, {access_token: 'ABC'}, ttl);
+        })
+        .catch((error) => {
+          expect(error).toEqual(jasmine.any(Store.RecordAlreadyExistsError));
+          done();
+        });
+    });
   });
 
   describe('"get"', () => {

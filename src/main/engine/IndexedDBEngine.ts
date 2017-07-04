@@ -4,7 +4,7 @@ import Dexie from 'dexie';
 export default class IndexedDBEngine implements CRUDEngine {
   private db: Dexie;
 
-  constructor(storeName: string) {
+  constructor(public storeName: string) {
     this.db = new Dexie(storeName);
   }
 

@@ -137,5 +137,9 @@ describe('store.ExpirationalStore', () => {
         })
         .catch((error) => done.fail(error));
     });
+
+    it('fires a timeout only once.', (done) => {
+      store.
+    });
   });
 });

@@ -3,7 +3,7 @@ import {EventEmitter} from 'events';
 export class Bundle {
   public expires: number;
   public payload: any;
-  public timeoutID?: number | NodeJS.Timer;
+  public timeoutID?: number | NodeJS.Timer; // Only cached values have a "timeoutID"
 }
 
 export default class ExpirationalStore extends EventEmitter {
@@ -76,10 +76,9 @@ export default class ExpirationalStore extends EventEmitter {
       .then((cacheKey: string) => {
         return Promise.all([cacheKey, this.startTimer(cacheKey, ttl)]);
       })
-      // TOOD: Use destructuring here
-      .then((result: [string, Bundle]) => {
-        // Save bundle with timeoutID in cache
-        return this.saveInCache(result[0], result[1]);
+      .then(([cacheKey, bundle]: [string, Bundle]) => {
+        // Note: Save bundle with timeoutID in cache (not in persistent storage)
+        return this.saveInCache(cacheKey, bundle);
       });
   }
 

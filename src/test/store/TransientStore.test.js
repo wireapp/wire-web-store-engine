@@ -1,5 +1,4 @@
-import {Bundle, TransientStore} from '../../../dist/commonjs/store';
-import {LocalStorageEngine} from '../../../dist/commonjs/engine';
+import {Store, StoreEngine} from '../../../dist/commonjs';
 
 describe('store.TransientStore', () => {
   const DATABASE_NAME = 'database-name';
@@ -9,8 +8,8 @@ describe('store.TransientStore', () => {
   let store = undefined;
 
   beforeEach((done) => {
-    engine = new LocalStorageEngine(DATABASE_NAME);
-    store = new TransientStore(engine);
+    engine = new StoreEngine.LocalStorageEngine(DATABASE_NAME);
+    store = new Store.TransientStore(engine);
     store.init(TABLE_NAME).then(done);
   });
 
@@ -115,7 +114,7 @@ describe('store.TransientStore', () => {
     afterEach(() => jasmine.clock().uninstall());
 
     it('publishes an event when an entity expires.', (done) => {
-      store.on(TransientStore.TOPIC.EXPIRED, (bundle) => {
+      store.on(Store.TransientStore.TOPIC.EXPIRED, (bundle) => {
         expect(bundle.payload).toBe(entity);
         done();
       });

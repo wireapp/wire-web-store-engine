@@ -17,14 +17,14 @@
  *
  */
 
-import {LocalStorageEngine} from '../../../dist/commonjs/engine';
+import {StoreEngine} from '../../../dist/commonjs';
 
-describe('engine.LocalStorageEngine', () => {
+describe('StoreEngine.LocalStorageEngine', () => {
   const DATABASE_NAME = 'database-name';
   let engine = undefined;
 
   beforeEach(() => {
-    engine = new LocalStorageEngine(DATABASE_NAME);
+    engine = new StoreEngine.LocalStorageEngine(DATABASE_NAME);
   });
 
   afterEach(() => {

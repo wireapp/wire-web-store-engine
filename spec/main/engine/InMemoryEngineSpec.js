@@ -1,11 +1,11 @@
-const InMemoryEngine = require('../../../dist/commonjs/engine').InMemoryEngine;
+const {StoreEngine} = require('../../../dist/commonjs');
 
-describe('engine.InMemoryEngine', () => {
+describe('StoreEngine.InMemoryEngine', () => {
   const DATABASE_NAME = 'database-name';
   let engine = undefined;
 
   beforeEach(() => {
-    engine = new InMemoryEngine(DATABASE_NAME);
+    engine = new StoreEngine.InMemoryEngine(DATABASE_NAME);
   });
 
   describe('"create"', () => {

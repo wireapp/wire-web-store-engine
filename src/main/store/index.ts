@@ -1,5 +1,5 @@
-import ExpirationalStore from './ExpirationalStore';
+import TransientStore from './TransientStore';
 
 export {
-  ExpirationalStore,
+  TransientStore,
 };

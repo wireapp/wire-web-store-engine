@@ -1,4 +1,4 @@
-import {ExpirationalStore} from './store';
+import {TransientStore} from './store';
 import {IndexedDBEngine, LocalStorageEngine} from './engine';
 
 module.exports = {
@@ -7,6 +7,6 @@ module.exports = {
     LocalStorageEngine,
   },
   store: {
-    ExpirationalStore: ExpirationalStore
+    TransientStore: TransientStore
   }
 };

@@ -123,7 +123,7 @@ export default class TransientStore extends EventEmitter {
 
   private expireEntity(cacheKey: string) {
     const expiredEntity = Object.assign({}, this.bundles[cacheKey]);
-    this.delete(cacheKey).then((cacheKey) => this.emit(ExpirationalStore.TOPIC.EXPIRED, expiredEntity));
+    this.delete(cacheKey).then((cacheKey) => this.emit(TransientStore.TOPIC.EXPIRED, expiredEntity));
   }
 
   private startTimer(cacheKey: string, ttl: number): Promise<Bundle> {

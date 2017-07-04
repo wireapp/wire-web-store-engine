@@ -1,7 +1,7 @@
 import {TransientStore} from './store';
 import {IndexedDBEngine, LocalStorageEngine} from './engine';
 
-module.exports = {
+export = {
   engine: {
     IndexedDBEngine,
     LocalStorageEngine,

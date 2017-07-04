@@ -6,7 +6,7 @@ export class Bundle {
   public timeoutID?: number | NodeJS.Timer; // Note: Only cached values have a "timeoutID"
 }
 
-export default class ExpirationalStore extends EventEmitter {
+export default class TransientStore extends EventEmitter {
   private bundles: { [index: string]: Bundle } = {};
   private tableName: string;
 

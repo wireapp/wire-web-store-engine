@@ -3,7 +3,7 @@ import {EventEmitter} from 'events';
 export class Bundle {
   public expires: number;
   public payload: any;
-  public timeoutID?: number | NodeJS.Timer; // Only cached values have a "timeoutID"
+  public timeoutID?: number | NodeJS.Timer; // Note: Only cached values have a "timeoutID"
 }
 
 export default class ExpirationalStore extends EventEmitter {
@@ -113,6 +113,10 @@ export default class ExpirationalStore extends EventEmitter {
   }
 
   private deleteFromCache(cacheKey: string): string {
+    const timeoutID = this.bundles[cacheKey].timeoutID;
+    if (timeoutID) {
+      clearTimeout((<any>timeoutID));
+    }
     delete this.bundles[cacheKey];
     return cacheKey;
   }
@@ -130,10 +134,8 @@ export default class ExpirationalStore extends EventEmitter {
 
         if (expires < Date.now()) {
           this.expireEntity(cacheKey);
-        } else {
-          clearTimeout((<any>timeoutID));
-          const timeoutObject: number | NodeJS.Timer = setTimeout(() => this.expireEntity(cacheKey), ttl);
-          bundle.timeoutID = timeoutObject;
+        } else if (!timeoutID) {
+          bundle.timeoutID = setTimeout(() => this.expireEntity(cacheKey), ttl);
         }
 
         return bundle;

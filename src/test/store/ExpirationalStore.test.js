@@ -138,8 +138,20 @@ describe('store.ExpirationalStore', () => {
         .catch((error) => done.fail(error));
     });
 
-    it('fires a timeout only once.', (done) => {
-      store.
+    it('keeps the same timer when being called multiple times.', (done) => {
+      let timeoutID = undefined;
+
+      store.set(primaryKey, entity, minuteInMillis)
+        .then((bundle) => {
+          timeoutID = bundle.timeoutID;
+          const cacheKey = store.constructCacheKey(primaryKey);
+          return store.startTimer(cacheKey, minuteInMillis);
+        })
+        .then((bundle) => {
+          expect(bundle.timeoutID).toBe(timeoutID);
+          done();
+        })
+        .catch((error) => done.fail(error));
     });
   });
 });

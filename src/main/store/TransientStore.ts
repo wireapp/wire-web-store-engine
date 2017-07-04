@@ -71,10 +71,10 @@ export default class TransientStore extends EventEmitter {
     return this.engine.read(this.tableName, primaryKey);
   }
 
-  public set<T>(primaryKey: string, entity: T, ttl: number): Promise<TransientBundle> {
+  public set<T>(primaryKey: string, payload: T, ttl: number): Promise<TransientBundle> {
     const bundle: TransientBundle = {
       expires: Date.now() + ttl,
-      payload: entity,
+      payload: payload,
     };
 
     return new Promise((resolve, reject) => {
@@ -134,9 +134,9 @@ export default class TransientStore extends EventEmitter {
     return cacheKey;
   }
 
-  private expireEntity(cacheKey: string) {
-    const expiredEntity = Object.assign({}, this.bundles[cacheKey]);
-    this.delete(cacheKey).then((cacheKey) => this.emit(TransientStore.TOPIC.EXPIRED, expiredEntity));
+  private expireBundle(cacheKey: string) {
+    const expiredBundle = Object.assign({}, this.bundles[cacheKey]);
+    this.delete(cacheKey).then((cacheKey) => this.emit(TransientStore.TOPIC.EXPIRED, expiredBundle));
   }
 
   private startTimer(cacheKey: string, ttl: number): Promise<TransientBundle> {
@@ -146,9 +146,9 @@ export default class TransientStore extends EventEmitter {
         const {expires, timeoutID} = bundle;
 
         if (expires < Date.now()) {
-          this.expireEntity(cacheKey);
+          this.expireBundle(cacheKey);
         } else if (!timeoutID) {
-          bundle.timeoutID = setTimeout(() => this.expireEntity(cacheKey), ttl);
+          bundle.timeoutID = setTimeout(() => this.expireBundle(cacheKey), ttl);
         }
 
         return bundle;

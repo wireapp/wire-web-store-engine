@@ -38,7 +38,7 @@ export default class TransientStore extends EventEmitter {
           const bundle = bundles[index];
           const cacheKey = cacheKeys[index];
 
-          this.startTimer(cacheKey, bundle.expires)
+          this.startTimer(cacheKey)
             .then(() => {
               this.bundles[cacheKey] = bundle;
             });
@@ -77,10 +77,17 @@ export default class TransientStore extends EventEmitter {
     return this.engine.read(this.tableName, primaryKey);
   }
 
-  public set<T>(primaryKey: string, payload: T, ttl: number): Promise<TransientBundle> {
+  /**
+   * Saves a transient record to the store and starts a timer to remove this record when the time to live (TTL) ended.
+   * @param {string} primaryKey - Primary key from which the FQN is created
+   * @param {string} record - A payload which should be kept in the TransientStore
+   * @param {number} ttl - The time to live (TTL) in milliseconds (ex. 1000 is 1s)
+   * @returns {Promise<TransientBundle>} A transient bundle, wrapping the initial record
+   */
+  public set<T>(primaryKey: string, record: T, ttl: number): Promise<TransientBundle> {
     const bundle: TransientBundle = {
       expires: Date.now() + ttl,
-      payload: payload,
+      payload: record,
     };
 
     return new Promise((resolve, reject) => {
@@ -91,7 +98,7 @@ export default class TransientStore extends EventEmitter {
             reject(new RecordAlreadyExistsError(message));
           } else {
             this.save(primaryKey, bundle)
-              .then((cacheKey: string) => Promise.all([cacheKey, this.startTimer(cacheKey, ttl)]))
+              .then((cacheKey: string) => Promise.all([cacheKey, this.startTimer(cacheKey)]))
               .then(([cacheKey, bundle]: [string, TransientBundle]) => {
                 // Note: Save bundle with timeoutID in cache (not in persistent storage)
                 resolve(this.saveInCache(cacheKey, bundle));
@@ -150,20 +157,22 @@ export default class TransientStore extends EventEmitter {
     return this.delete(cacheKey).then(() => expiredBundle);
   }
 
-  private startTimer(cacheKey: string, ttl: number): Promise<TransientBundle> {
+  // TODO: Change method signature to "cacheKey: string, bundle: TransientBundle"
+  private startTimer(cacheKey: string): Promise<TransientBundle> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
     return this.get(primaryKey)
       .then((bundle: TransientBundle) => {
         const {expires, timeoutID} = bundle;
+        const timespan: number = expires - Date.now();
 
-        if (expires < Date.now()) {
+        if (expires <= 0) {
           this.expireBundle(cacheKey);
         } else if (!timeoutID) {
           bundle.timeoutID = setTimeout(() => {
             this.expireBundle(cacheKey).then((expiredBundle: ExpiredBundle) => {
               this.emit(TransientStore.TOPIC.EXPIRED, expiredBundle);
             })
-          }, ttl);
+          }, timespan);
         }
 
         return bundle;

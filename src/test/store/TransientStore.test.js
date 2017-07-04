@@ -20,7 +20,7 @@ describe('store.TransientStore', () => {
   describe('"set"', () => {
     const entity = {access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ=='};
     const primaryKey = 'access-tokens';
-    const ttl = 900;
+    const ttl = 1000;
 
     it('saves a record together with it\'s expiration date.', (done) => {
       store.set(primaryKey, entity, ttl)
@@ -124,7 +124,11 @@ describe('store.TransientStore', () => {
     const primaryKey = 'access-tokens';
     const minuteInMillis = 60000;
 
-    beforeEach(() => jasmine.clock().install());
+    beforeEach(() => {
+      jasmine.clock().install();
+      jasmine.clock().mockDate();
+    });
+
     afterEach(() => jasmine.clock().uninstall());
 
     it('publishes an event when an entity expires.', (done) => {

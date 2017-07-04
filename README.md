@@ -22,4 +22,4 @@ Provider for different storage engines.
 ## Motivation
 - Unifying API calls to commonly used storage APIs (File, IndexedDB, localStorage, Memory)
 - Providing convenient database functions (create, update, read, delete)
-- Providing advanced storage mechanisms (expiring records, ...)
+- Providing advanced storage mechanisms (transient records, ...)

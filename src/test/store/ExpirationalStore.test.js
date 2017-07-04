@@ -18,13 +18,11 @@ describe('store.ExpirationalStore', () => {
   });
 
   describe('"set"', () => {
-    it('saves a record together with it\'s expiration date.', (done) => {
-      const entity = {
-        access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-      };
-      const primaryKey = 'access-tokens';
-      const ttl = 900;
+    const entity = {access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ=='};
+    const primaryKey = 'access-tokens';
+    const ttl = 900;
 
+    it('saves a record together with it\'s expiration date.', (done) => {
       store.set(primaryKey, entity, ttl)
         .then((bundle) => {
           expect(bundle.expires).toEqual(jasmine.any(Number));
@@ -34,15 +32,9 @@ describe('store.ExpirationalStore', () => {
     });
 
     it('saves a record together with it\'s timeoutID.', (done) => {
-      const entity = {
-        access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-      };
-      const primaryKey = 'access-tokens';
-      const ttl = 900;
-
       store.set(primaryKey, entity, ttl)
         .then((bundle) => {
-          expect(bundle.timeoutID).toEqual(jasmine.any(Number));
+          expect(bundle.timeoutID).toBeDefined();
           done();
         })
         .catch((error) => done.fail(error));
@@ -50,12 +42,11 @@ describe('store.ExpirationalStore', () => {
   });
 
   describe('"get"', () => {
+    const entity = {access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ=='};
+    const ttl = 900;
+
     it('returns a saved record together with it\'s expiration.', (done) => {
-      const entity = {
-        access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-      };
       const primaryKey = 'access-tokens';
-      const ttl = 900;
 
       store.set(primaryKey, entity, ttl)
         .then(() => {
@@ -67,11 +58,7 @@ describe('store.ExpirationalStore', () => {
     });
 
     it('returns a saved record with an "@" in it\'s primary key.', (done) => {
-      const entity = {
-        access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-      };
-      const primaryKey = 'access@tokens';
-      const ttl = 900;
+      const primaryKey = '@access@tokens';
 
       store.set(primaryKey, entity, ttl)
         .then(() => {
@@ -82,8 +69,8 @@ describe('store.ExpirationalStore', () => {
         .catch((error) => done.fail(error));
     });
 
-    it('returns a non-existent record as undefined.', (done) => {
-      const primaryKey = 'access@tokens';
+    it('returns a non-existent record as "undefined".', (done) => {
+      const primaryKey = 'not-found';
 
       store.get(primaryKey)
         .then((bundle) => expect(bundle).toBeUndefined())
@@ -119,16 +106,14 @@ describe('store.ExpirationalStore', () => {
   });
 
   describe('"startTimer"', () => {
+    const entity = {access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ=='};
+    const primaryKey = 'access-tokens';
+    const minuteInMillis = 60000;
+
     beforeEach(() => jasmine.clock().install());
     afterEach(() => jasmine.clock().uninstall());
 
     it('publishes an event when an entity expires.', (done) => {
-      const entity = {
-        access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-      };
-      const primaryKey = 'access-tokens';
-      const minuteInMillis = 60000;
-
       store.on(ExpirationalStore.TOPIC.EXPIRED, (bundle) => {
         expect(bundle.payload).toBe(entity);
         done();
@@ -140,12 +125,6 @@ describe('store.ExpirationalStore', () => {
     });
 
     it('deletes expired entities.', (done) => {
-      const entity = {
-        access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-      };
-      const primaryKey = 'access-tokens';
-      const minuteInMillis = 60000;
-
       store.set(primaryKey, entity, minuteInMillis)
         .then(() => {
           jasmine.clock().tick(minuteInMillis + 1);

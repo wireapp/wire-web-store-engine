@@ -207,9 +207,7 @@ describe('engine.InMemoryEngine', () => {
         engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
         engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
       ])
-        .then(() => {
-          return engine.readAllPrimaryKeys(TABLE_NAME);
-        })
+        .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
         .then((keys) => {
           expect(keys.length).toBe(3);
           done();

@@ -1,3 +1,4 @@
+import {CRUDEngine} from '../engine';
 import {EventEmitter} from 'events';
 
 export class Bundle {

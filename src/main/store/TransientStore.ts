@@ -85,9 +85,7 @@ export default class TransientStore extends EventEmitter {
             reject(new RecordAlreadyExistsError(message));
           } else {
             this.save(primaryKey, bundle)
-              .then((cacheKey: string) => {
-                return Promise.all([cacheKey, this.startTimer(cacheKey, ttl)]);
-              })
+              .then((cacheKey: string) => Promise.all([cacheKey, this.startTimer(cacheKey, ttl)]))
               .then(([cacheKey, bundle]: [string, TransientBundle]) => {
                 // Note: Save bundle with timeoutID in cache (not in persistent storage)
                 resolve(this.saveInCache(cacheKey, bundle));

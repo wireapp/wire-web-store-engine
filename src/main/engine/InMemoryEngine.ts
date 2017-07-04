@@ -1,3 +1,5 @@
+import CRUDEngine from './CRUDEngine';
+
 export default class InMemoryEngine implements CRUDEngine {
   private stores: { [index: string]: { [index: string]: any } } = {};
 

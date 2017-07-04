@@ -1,3 +1,4 @@
+import CRUDEngine from './CRUDEngine';
 import Dexie from 'dexie';
 
 export default class IndexedDBEngine implements CRUDEngine {

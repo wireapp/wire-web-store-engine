@@ -2,12 +2,12 @@ import {TransientStore} from './store';
 import {IndexedDBEngine, InMemoryEngine, LocalStorageEngine} from './engine';
 
 export = {
-  engine: {
+  Store: {
+    TransientStore,
+  },
+  StoreEngine: {
     IndexedDBEngine,
     InMemoryEngine,
     LocalStorageEngine,
-  },
-  store: {
-    TransientStore: TransientStore
   }
 };

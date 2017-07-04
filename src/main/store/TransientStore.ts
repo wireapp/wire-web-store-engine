@@ -1,14 +1,9 @@
 import {CRUDEngine} from '../engine';
 import {EventEmitter} from 'events';
-
-export class Bundle {
-  public expires: number;
-  public payload: any;
-  public timeoutID?: number | NodeJS.Timer; // Note: Only cached values have a "timeoutID"
-}
+import TransientBundle from './TransientBundle';
 
 export default class TransientStore extends EventEmitter {
-  private bundles: { [index: string]: Bundle } = {};
+  private bundles: { [index: string]: TransientBundle } = {};
   private tableName: string;
 
   public static TOPIC = {
@@ -19,14 +14,14 @@ export default class TransientStore extends EventEmitter {
     super();
   }
 
-  public init(tableName: string): Promise<Array<Bundle>> {
+  public init(tableName: string): Promise<Array<TransientBundle>> {
     this.tableName = tableName;
 
     let cacheKeys: Array<string> = [];
 
     return this.store.readAllPrimaryKeys(this.tableName)
       .then((primaryKeys: Array<string>) => {
-        const readBundles: Array<Promise<Bundle>> = [];
+        const readBundles: Array<Promise<TransientBundle>> = [];
 
         primaryKeys.forEach((primaryKey: string) => {
           const cacheKey: string = this.constructCacheKey(primaryKey);
@@ -36,7 +31,7 @@ export default class TransientStore extends EventEmitter {
 
         return Promise.all(readBundles);
       })
-      .then((bundles: Array<Bundle>) => {
+      .then((bundles: Array<TransientBundle>) => {
         for (let index in bundles) {
           const bundle = bundles[index];
           const cacheKey = cacheKeys[index];
@@ -59,7 +54,7 @@ export default class TransientStore extends EventEmitter {
     return cacheKey.replace(`${this.tableName}@`, '');
   }
 
-  public get(primaryKey: string): Promise<Bundle> {
+  public get(primaryKey: string): Promise<TransientBundle> {
     const cacheBundle = this.bundles[this.constructCacheKey(primaryKey)];
     if (cacheBundle) {
       return Promise.resolve(cacheBundle);
@@ -67,7 +62,7 @@ export default class TransientStore extends EventEmitter {
     return this.store.read(this.tableName, primaryKey);
   }
 
-  public set<T>(primaryKey: string, entity: T, ttl: number): Promise<Bundle> {
+  public set<T>(primaryKey: string, entity: T, ttl: number): Promise<TransientBundle> {
     const bundle = {
       expires: Date.now() + ttl,
       payload: entity,
@@ -77,7 +72,7 @@ export default class TransientStore extends EventEmitter {
       .then((cacheKey: string) => {
         return Promise.all([cacheKey, this.startTimer(cacheKey, ttl)]);
       })
-      .then(([cacheKey, bundle]: [string, Bundle]) => {
+      .then(([cacheKey, bundle]: [string, TransientBundle]) => {
         // Note: Save bundle with timeoutID in cache (not in persistent storage)
         return this.saveInCache(cacheKey, bundle);
       });
@@ -127,10 +122,10 @@ export default class TransientStore extends EventEmitter {
     this.delete(cacheKey).then((cacheKey) => this.emit(TransientStore.TOPIC.EXPIRED, expiredEntity));
   }
 
-  private startTimer(cacheKey: string, ttl: number): Promise<Bundle> {
+  private startTimer(cacheKey: string, ttl: number): Promise<TransientBundle> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
     return this.get(primaryKey)
-      .then((bundle: Bundle) => {
+      .then((bundle: TransientBundle) => {
         const {expires, timeoutID} = bundle;
 
         if (expires < Date.now()) {

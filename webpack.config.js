@@ -6,7 +6,7 @@ module.exports = {
     }
   },
   entry: {
-    'engine-bundle': `${__dirname}/dist/commonjs/index.js`,
+    'demo-bundle': `${__dirname}/src/demo/index.js`,
     'test-bundle': `${__dirname}/src/test/index.js`,
   },
   output: {

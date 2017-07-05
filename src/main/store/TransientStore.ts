@@ -125,8 +125,8 @@ export default class TransientStore extends EventEmitter {
     return this.bundles[cacheKey] = (<any>bundle);
   }
 
-  public delete(cacheKey: string): Promise<string> {
-    const primaryKey = this.constructPrimaryKey(cacheKey);
+  public delete(primaryKey: string): Promise<string> {
+    const cacheKey = this.constructCacheKey(primaryKey);
 
     return Promise.all([
       this.deleteFromStore(primaryKey),
@@ -154,7 +154,7 @@ export default class TransientStore extends EventEmitter {
       primaryKey: this.constructPrimaryKey(cacheKey),
     };
 
-    return this.delete(cacheKey).then(() => expiredBundle);
+    return this.delete(expiredBundle.primaryKey).then(() => expiredBundle);
   }
 
   // TODO: Change method signature to "cacheKey: string, bundle: TransientBundle"

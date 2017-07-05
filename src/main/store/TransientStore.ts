@@ -125,7 +125,7 @@ export default class TransientStore extends EventEmitter {
     return this.bundles[cacheKey] = (<any>bundle);
   }
 
-  private delete(cacheKey: string): Promise<string> {
+  public delete(cacheKey: string): Promise<string> {
     const primaryKey = this.constructPrimaryKey(cacheKey);
 
     return Promise.all([

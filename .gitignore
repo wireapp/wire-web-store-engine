@@ -1,6 +1,5 @@
 .yarnclean
-/.idea/vcs.xml
-/.idea/workspace.xml
+/.idea
 /bower_components
 /dist
 /node_modules

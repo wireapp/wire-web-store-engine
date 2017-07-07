@@ -139,7 +139,7 @@ export default class TransientStore extends EventEmitter {
   }
 
   private deleteFromCache(cacheKey: string): string {
-    const timeoutID = this.bundles[cacheKey].timeoutID;
+    const timeoutID = this.bundles[cacheKey] && this.bundles[cacheKey].timeoutID;
     if (timeoutID) {
       clearTimeout((<any>timeoutID));
     }

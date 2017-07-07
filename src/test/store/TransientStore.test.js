@@ -119,6 +119,14 @@ describe('store.TransientStore', () => {
     });
   });
 
+  describe('"deleteFromCache"', () => {
+    it('doesn\'t fail when deleting non-existent records.', () => {
+      const cacheKey = 'non-existent';
+      const deletedCacheKey = store.deleteFromCache(cacheKey);
+      expect(deletedCacheKey).toBe(cacheKey);
+    });
+  });
+
   describe('"startTimer"', () => {
     const entity = {access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ=='};
     const primaryKey = 'access-tokens';

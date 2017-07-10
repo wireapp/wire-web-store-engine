@@ -61,6 +61,13 @@ export default class TransientStore extends EventEmitter {
     return cacheKey.replace(`${this.engine.storeName}@${this.tableName}@`, '');
   }
 
+  private createTransientBundle<T>(record: T, ttl: number) {
+    return {
+      expires: Date.now() + ttl,
+      payload: record,
+    };
+  }
+
   public get(primaryKey: string): Promise<TransientBundle> {
     return this.getFromCache(primaryKey)
       .then((cachedBundle: TransientBundle) => {
@@ -85,10 +92,7 @@ export default class TransientStore extends EventEmitter {
    * @returns {Promise<TransientBundle>} A transient bundle, wrapping the initial record
    */
   public set<T>(primaryKey: string, record: T, ttl: number): Promise<TransientBundle> {
-    const bundle: TransientBundle = {
-      expires: Date.now() + ttl,
-      payload: record,
-    };
+    const bundle: TransientBundle = this.createTransientBundle(record, ttl);
 
     return new Promise((resolve, reject) => {
       this.getFromCache(primaryKey)

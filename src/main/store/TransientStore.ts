@@ -126,7 +126,7 @@ export default class TransientStore extends EventEmitter {
   }
 
   private saveInCache<TransientBundle>(cacheKey: string, bundle: TransientBundle): TransientBundle {
-    return this.bundles[cacheKey] = (<any>bundle);
+    return this.bundles[cacheKey] = <any>bundle;
   }
 
   public delete(primaryKey: string): Promise<string> {
@@ -145,7 +145,7 @@ export default class TransientStore extends EventEmitter {
   private deleteFromCache(cacheKey: string): string {
     const timeoutID = this.bundles[cacheKey] && this.bundles[cacheKey].timeoutID;
     if (timeoutID) {
-      clearTimeout((<any>timeoutID));
+      clearTimeout(<number>timeoutID);
     }
     delete this.bundles[cacheKey];
     return cacheKey;

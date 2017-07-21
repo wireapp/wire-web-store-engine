@@ -10,10 +10,16 @@ export default class FileEngine implements CRUDEngine {
     this.storeName = path.normalize(storeName);
   }
 
-  create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
-    // TODO: Serialize records so that binary data can be saved too.
-    // TODO: If type of entity is "object", use "JSON.stringify"
+  create<T>(tableName: string, primaryKey: string, entity: any): Promise<string> {
+    // TODO: Implement "base64" serialization to save any kind of data.
     const file: string = path.normalize(`${this.storeName}/${tableName}/${primaryKey}.dat`);
+    if (typeof entity === 'object') {
+      try {
+        entity = JSON.stringify(entity);
+      } catch(error) {
+        entity = entity.toString();
+      }
+    }
     return fs.outputFile(file, entity).then(() => primaryKey);
   }
 

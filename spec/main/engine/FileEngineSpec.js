@@ -20,7 +20,7 @@ describe('StoreEngine.FileEngine', () => {
         some: 'value'
       };
 
-      engine.create(TABLE_NAME, PRIMARY_KEY, JSON.stringify(entity))
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
         .then((primaryKey) => {
           expect(primaryKey).toEqual(PRIMARY_KEY);
           done();
@@ -124,9 +124,10 @@ describe('StoreEngine.FileEngine', () => {
         some: 'value'
       };
 
-      engine.create(TABLE_NAME, PRIMARY_KEY, JSON.stringify(entity))
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
         .then((primaryKey) => engine.read(TABLE_NAME, primaryKey)
         .then((record) => {
+          // TODO: Update "FileEngine" implementation so that "JSON.parse" is not needed in test.
           const data = JSON.parse(record);
           expect(data.some).toEqual(entity.some);
           done();
@@ -164,13 +165,14 @@ describe('StoreEngine.FileEngine', () => {
       };
 
       Promise.all([
-        engine.create(TABLE_NAME, homer.primaryKey, JSON.stringify(homer.entity)),
-        engine.create(TABLE_NAME, lisa.primaryKey, JSON.stringify(lisa.entity)),
-        engine.create(TABLE_NAME, marge.primaryKey, JSON.stringify(marge.entity)),
+        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
+        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
+        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
       ])
       .then(() => engine.readAll(TABLE_NAME))
       .then((records) => {
         expect(records.length).toBe(3);
+        // TODO: Update "FileEngine" implementation so that "JSON.parse" is not needed in test.
         expect(JSON.parse(records[0]).firstName).toBe(homer.entity.firstName);
         expect(JSON.parse(records[1]).firstName).toBe(lisa.entity.firstName);
         expect(JSON.parse(records[2]).firstName).toBe(marge.entity.firstName);
@@ -208,9 +210,9 @@ describe('StoreEngine.FileEngine', () => {
       };
 
       Promise.all([
-        engine.create(TABLE_NAME, homer.primaryKey, JSON.stringify(homer.entity)),
-        engine.create(TABLE_NAME, lisa.primaryKey, JSON.stringify(lisa.entity)),
-        engine.create(TABLE_NAME, marge.primaryKey, JSON.stringify(marge.entity)),
+        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
+        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
+        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
       ])
       .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
       .then((primaryKeys) => {
@@ -240,10 +242,11 @@ describe('StoreEngine.FileEngine', () => {
         }
       };
 
-      engine.create(TABLE_NAME, PRIMARY_KEY, JSON.stringify(entity))
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
         .then(() => engine.update(TABLE_NAME, PRIMARY_KEY, updates))
         .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
         .then((updatedRecord) => {
+          // TODO: Update "FileEngine" implementation so that "JSON.parse" is not needed in test.
           updatedRecord = JSON.parse(updatedRecord);
           expect(updatedRecord.name).toBe(entity.name);
           expect(updatedRecord.age).toBe(updates.age);

@@ -178,11 +178,11 @@ describe('StoreEngine.LocalStorageEngine', () => {
         engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
         engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
       ])
-        .then(() => engine.readAll(TABLE_NAME))
-        .then((records) => {
-          expect(records.length).toBe(3);
-          done();
-        });
+      .then(() => engine.readAll(TABLE_NAME))
+      .then((records) => {
+        expect(records.length).toBe(3);
+        done();
+      });
     });
   });
 

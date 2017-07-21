@@ -137,6 +137,50 @@ describe('StoreEngine.FileEngine', () => {
     });
   });
 
+  describe('"readAll"', () => {
+    it('returns multiple database records.', (done) => {
+      const TABLE_NAME = 'table-name';
+
+      const homer = {
+        primaryKey: 'homer-simpson',
+        entity: {
+          firstName: 'Homer',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const lisa = {
+        primaryKey: 'lisa-simpson',
+        entity: {
+          firstName: 'Lisa',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const marge = {
+        primaryKey: 'marge-simpson',
+        entity: {
+          firstName: 'Marge',
+          lastNme: 'Simpson'
+        }
+      };
+
+      Promise.all([
+        engine.create(TABLE_NAME, homer.primaryKey, JSON.stringify(homer.entity)),
+        engine.create(TABLE_NAME, lisa.primaryKey, JSON.stringify(lisa.entity)),
+        engine.create(TABLE_NAME, marge.primaryKey, JSON.stringify(marge.entity)),
+      ])
+      .then(() => engine.readAll(TABLE_NAME))
+      .then((records) => {
+        expect(records.length).toBe(3);
+        expect(JSON.parse(records[0]).firstName).toBe(homer.entity.firstName);
+        expect(JSON.parse(records[1]).firstName).toBe(lisa.entity.firstName);
+        expect(JSON.parse(records[2]).firstName).toBe(marge.entity.firstName);
+        done();
+      });
+    });
+  });
+
   describe('"readAllPrimaryKeys"', () => {
     it('gets the primary keys of all records in a table.', (done) => {
       const TABLE_NAME = 'table-name';
@@ -166,9 +210,9 @@ describe('StoreEngine.FileEngine', () => {
       };
 
       Promise.all([
-        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
-        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
-        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
+        engine.create(TABLE_NAME, homer.primaryKey, JSON.stringify(homer.entity)),
+        engine.create(TABLE_NAME, lisa.primaryKey, JSON.stringify(lisa.entity)),
+        engine.create(TABLE_NAME, marge.primaryKey, JSON.stringify(marge.entity)),
       ])
       .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
       .then((primaryKeys) => {

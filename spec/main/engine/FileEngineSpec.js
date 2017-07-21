@@ -7,9 +7,7 @@ describe('StoreEngine.FileEngine', () => {
   const DATABASE_NAME = TEST_DIRECTORY;
   let engine = undefined;
 
-  beforeEach(() => {
-    engine = new StoreEngine.FileEngine(DATABASE_NAME);
-  });
+  beforeEach(() => engine = new StoreEngine.FileEngine(DATABASE_NAME));
 
   afterEach((done) => fs.remove(TEST_DIRECTORY).then(done).catch(done.fail));
 
@@ -66,12 +64,12 @@ describe('StoreEngine.FileEngine', () => {
       ])
       .then(() => engine.delete(TABLE_NAME, lisa.primaryKey))
       .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
-        .then((primaryKeys) => {
-          expect(primaryKeys.length).toBe(2);
-          expect(primaryKeys[0]).toBe(homer.primaryKey);
-          expect(primaryKeys[1]).toBe(marge.primaryKey);
-          done();
-        });
+      .then((primaryKeys) => {
+        expect(primaryKeys.length).toBe(2);
+        expect(primaryKeys[0]).toBe(homer.primaryKey);
+        expect(primaryKeys[1]).toBe(marge.primaryKey);
+        done();
+      });
     });
   });
 

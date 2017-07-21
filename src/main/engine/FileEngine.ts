@@ -4,30 +4,28 @@ import path = require('path');
 import {RecordNotFoundError} from './error';
 
 export default class FileEngine implements CRUDEngine {
-  storeName: string;
+  public storeName: string;
 
   constructor(storeName: string) {
     this.storeName = path.normalize(storeName);
   }
 
   create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
-    const file: string = path.normalize(`${this.storeName}/${tableName}/${primaryKey}.txt`);
+    const file: string = path.normalize(`${this.storeName}/${tableName}/${primaryKey}.dat`);
     return fs.outputFile(file, entity).then(() => primaryKey);
   }
 
   delete(tableName: string, primaryKey: string): Promise<string> {
-    return fs.remove(tableName)
-      .then(() => {
-        return true;
-      });
+    const file: string = path.normalize(`${this.storeName}/${tableName}/${primaryKey}.dat`);
+    return fs.remove(file).then(() => primaryKey);
   }
 
   deleteAll(tableName: string): Promise<boolean> {
-    return undefined;
+    return fs.remove(tableName).then(() => true);
   }
 
   read<T>(tableName: string, primaryKey: string): Promise<T> {
-    const file: string = path.normalize(`${this.storeName}/${tableName}/${primaryKey}.txt`);
+    const file: string = path.normalize(`${this.storeName}/${tableName}/${primaryKey}.dat`);
 
     return new Promise((resolve, reject) => {
       fs.readFile(file, {encoding: 'utf8', flag: 'r'}, function (error, data: any) {
@@ -45,14 +43,37 @@ export default class FileEngine implements CRUDEngine {
   }
 
   readAll<T>(tableName: string): Promise<T[]> {
-    return undefined;
+    const directory: string = path.normalize(`${this.storeName}/${tableName}`);
+    return new Promise((resolve, reject) => {
+      fs.readdir(directory, (error, files) => {
+        if (error) {
+          reject(error);
+        } else {
+          const recordNames = files.map((file) => path.basename(file, path.extname(file)));
+          const promises = recordNames.map((primaryKey) => this.read(tableName, primaryKey));
+          Promise.all(promises).then((records: T[]) => resolve(records));
+        }
+      });
+    });
   }
 
   readAllPrimaryKeys(tableName: string): Promise<string[]> {
-    return undefined;
+    const directory: string = path.normalize(`${this.storeName}/${tableName}`);
+    return new Promise((resolve, reject) => {
+      fs.readdir(directory, (error, files) => {
+        if (error) {
+          reject(error);
+        } else {
+          const fileNames: string[] = files.map((file: string) => path.parse(file).name);
+          resolve(fileNames);
+        }
+      })
+    });
   }
 
   update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
-    return undefined;
+    return this.read(tableName, primaryKey)
+      .then((record: any) => Object.assign({}, record))
+      .then((updatedRecord: any) => this.create(tableName, primaryKey, updatedRecord));
   }
 }

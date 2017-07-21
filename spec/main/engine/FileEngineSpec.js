@@ -24,12 +24,56 @@ describe('StoreEngine.FileEngine', () => {
 
       engine.create(TABLE_NAME, PRIMARY_KEY, JSON.stringify(entity))
         .then((primaryKey) => engine.read(TABLE_NAME, primaryKey)
-        .then((record) => {
-          const data = JSON.parse(record);
-          expect(data.some).toEqual(entity.some);
+          .then((record) => {
+            const data = JSON.parse(record);
+            expect(data.some).toEqual(entity.some);
+            done();
+          })
+          .catch((error) => done.fail(error)));
+    });
+  });
+
+  describe('"delete"', () => {
+    it('deletes an entity.', (done) => {
+      const TABLE_NAME = 'table-name';
+
+      const homer = {
+        primaryKey: 'homer-simpson',
+        entity: {
+          firstName: 'Homer',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const lisa = {
+        primaryKey: 'lisa-simpson',
+        entity: {
+          firstName: 'Lisa',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const marge = {
+        primaryKey: 'marge-simpson',
+        entity: {
+          firstName: 'Marge',
+          lastNme: 'Simpson'
+        }
+      };
+
+      Promise.all([
+        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
+        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
+        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
+      ])
+      .then(() => engine.delete(TABLE_NAME, lisa.primaryKey))
+      .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
+        .then((primaryKeys) => {
+          expect(primaryKeys.length).toBe(2);
+          expect(primaryKeys[0]).toBe(homer.primaryKey);
+          expect(primaryKeys[1]).toBe(marge.primaryKey);
           done();
-        })
-        .catch((error) => done.fail(error)));
+        });
     });
   });
 

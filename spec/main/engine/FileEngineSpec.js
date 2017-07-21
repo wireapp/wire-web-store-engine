@@ -23,13 +23,11 @@ describe('StoreEngine.FileEngine', () => {
       };
 
       engine.create(TABLE_NAME, PRIMARY_KEY, JSON.stringify(entity))
-        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey)
-          .then((record) => {
-            const data = JSON.parse(record);
-            expect(data.some).toEqual(entity.some);
-            done();
-          })
-          .catch((error) => done.fail(error)));
+        .then((primaryKey) => {
+          expect(primaryKey).toEqual(PRIMARY_KEY);
+          done();
+        })
+        .catch((error) => done.fail(error));
     });
   });
 
@@ -116,6 +114,26 @@ describe('StoreEngine.FileEngine', () => {
         expect(primaryKeys.length).toBe(0);
         done();
       });
+    });
+  });
+
+  describe('"read"', () => {
+    it('returns a database record.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, JSON.stringify(entity))
+        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey)
+        .then((record) => {
+          const data = JSON.parse(record);
+          expect(data.some).toEqual(entity.some);
+          done();
+        })
+        .catch((error) => done.fail(error)));
     });
   });
 

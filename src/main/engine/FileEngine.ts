@@ -17,11 +17,12 @@ export default class FileEngine implements CRUDEngine {
 
   delete(tableName: string, primaryKey: string): Promise<string> {
     const file: string = path.normalize(`${this.storeName}/${tableName}/${primaryKey}.dat`);
-    return fs.remove(file).then(() => primaryKey);
+    return fs.remove(file).then(() => primaryKey).catch(() => false);
   }
 
   deleteAll(tableName: string): Promise<boolean> {
-    return fs.remove(tableName).then(() => true);
+    const directory: string = path.normalize(`${this.storeName}/${tableName}`);
+    return fs.remove(directory).then(() => true).catch(() => false);
   }
 
   read<T>(tableName: string, primaryKey: string): Promise<T> {

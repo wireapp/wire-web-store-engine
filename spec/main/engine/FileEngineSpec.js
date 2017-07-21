@@ -11,7 +11,7 @@ describe('StoreEngine.FileEngine', () => {
     engine = new StoreEngine.FileEngine(DATABASE_NAME);
   });
 
-  afterEach((done) => fs.remove(TEST_DIRECTORY).then(done));
+  afterEach((done) => fs.remove(TEST_DIRECTORY).then(done).catch(done.fail));
 
   describe('"create"', () => {
     it('creates a serialized database record.', (done) => {
@@ -74,6 +74,47 @@ describe('StoreEngine.FileEngine', () => {
           expect(primaryKeys[1]).toBe(marge.primaryKey);
           done();
         });
+    });
+  });
+
+  describe('"deleteAll"', () => {
+    it('deletes all entities.', (done) => {
+      const TABLE_NAME = 'table-name';
+
+      const homer = {
+        primaryKey: 'homer-simpson',
+        entity: {
+          firstName: 'Homer',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const lisa = {
+        primaryKey: 'lisa-simpson',
+        entity: {
+          firstName: 'Lisa',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const marge = {
+        primaryKey: 'marge-simpson',
+        entity: {
+          firstName: 'Marge',
+          lastNme: 'Simpson'
+        }
+      };
+
+      Promise.all([
+        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
+        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
+        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
+      ])
+      .then(() => engine.deleteAll(TABLE_NAME))
+      .then((hasBeenDeleted) => {
+        expect(hasBeenDeleted).toBe(true);
+        done();
+      });
     });
   });
 

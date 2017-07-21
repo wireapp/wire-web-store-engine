@@ -63,7 +63,11 @@ export default class FileEngine implements CRUDEngine {
     return new Promise((resolve, reject) => {
       fs.readdir(directory, (error, files) => {
         if (error) {
-          reject(error);
+          if(error.code === 'ENOENT') {
+            resolve([]);
+          } else {
+            reject(error);
+          }
         } else {
           const fileNames: string[] = files.map((file: string) => path.parse(file).name);
           resolve(fileNames);

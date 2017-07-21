@@ -111,8 +111,9 @@ describe('StoreEngine.FileEngine', () => {
         engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
       ])
       .then(() => engine.deleteAll(TABLE_NAME))
-      .then((hasBeenDeleted) => {
-        expect(hasBeenDeleted).toBe(true);
+      .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
+      .then((primaryKeys) => {
+        expect(primaryKeys.length).toBe(0);
         done();
       });
     });

@@ -9,6 +9,12 @@ module.exports = {
     'demo-bundle': `${__dirname}/src/demo/index.js`,
     'test-bundle': `${__dirname}/src/test/index.js`,
   },
+  node: {
+    path: 'empty',
+  },
+  externals: {
+    'fs-extra': '{}',
+  },
   output: {
     path: `${__dirname}/dist`,
     filename: `[name].js`,

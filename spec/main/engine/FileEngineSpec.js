@@ -1,5 +1,5 @@
-const fs = require('fs-extra');
 const path = require('path');
+const rimraf = require('rimraf');
 const {StoreEngine} = require('../../../dist/commonjs');
 
 describe('StoreEngine.FileEngine', () => {
@@ -12,11 +12,16 @@ describe('StoreEngine.FileEngine', () => {
   });
 
   afterEach((done) => {
-    fs.remove(TEST_DIRECTORY).then(done);
+    rimraf(TEST_DIRECTORY, function(error) {
+      if (error) {
+        done.fail(error);
+      }
+      done();
+    })
   });
 
   describe('create', () => {
-    fit('creates a serialized database record.', (done) => {
+    it('creates a serialized database record.', (done) => {
       const TABLE_NAME = 'table-name';
       const PRIMARY_KEY = 'primary-key';
 

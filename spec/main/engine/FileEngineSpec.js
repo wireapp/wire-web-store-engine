@@ -11,9 +11,7 @@ describe('StoreEngine.FileEngine', () => {
     engine = new StoreEngine.FileEngine(DATABASE_NAME);
   });
 
-  afterEach((done) => {
-    fs.remove(TEST_DIRECTORY).then(done);
-  });
+  afterEach((done) => fs.remove(TEST_DIRECTORY).then(done));
 
   describe('"create"', () => {
     it('creates a serialized database record.', (done) => {
@@ -25,20 +23,18 @@ describe('StoreEngine.FileEngine', () => {
       };
 
       engine.create(TABLE_NAME, PRIMARY_KEY, JSON.stringify(entity))
-        .then((primaryKey) => {
-          return engine.read(TABLE_NAME, primaryKey);
-        })
+        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey)
         .then((record) => {
           const data = JSON.parse(record);
           expect(data.some).toEqual(entity.some);
           done();
         })
-        .catch((error) => done.fail(error));
+        .catch((error) => done.fail(error)));
     });
   });
 
   describe('"readAllPrimaryKeys"', () => {
-    fit('gets the primary keys of all records in a table.', (done) => {
+    it('gets the primary keys of all records in a table.', (done) => {
       const TABLE_NAME = 'table-name';
 
       const homer = {
@@ -69,9 +65,9 @@ describe('StoreEngine.FileEngine', () => {
         engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
         engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
         engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
-      ]).then(() => {
-        return engine.readAllPrimaryKeys(TABLE_NAME);
-      }).then((primaryKeys) => {
+      ])
+      .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
+      .then((primaryKeys) => {
         expect(primaryKeys.length).toBe(3);
         expect(primaryKeys[0]).toBe(homer.primaryKey);
         expect(primaryKeys[1]).toBe(lisa.primaryKey);

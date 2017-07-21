@@ -224,4 +224,37 @@ describe('StoreEngine.FileEngine', () => {
       });
     });
   });
+
+  describe('"update"', () => {
+    it('updates an existing database record.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        name: 'Old monitor'
+      };
+
+      const updates = {
+        age: 177,
+        size: {
+          height: 1080,
+          width: 1920
+        }
+      };
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, JSON.stringify(entity))
+        .then(() => engine.update(TABLE_NAME, PRIMARY_KEY, updates))
+        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
+        .then((updatedRecord) => {
+          updatedRecord = JSON.parse(updatedRecord);
+          expect(updatedRecord.name).toBe(entity.name);
+          expect(updatedRecord.age).toBe(updates.age);
+          expect(Object.keys(updatedRecord.size).length).toBe(2);
+          expect(updatedRecord.size.height).toBe(updates.size.height);
+          expect(updatedRecord.size.width).toBe(updates.size.width);
+          done();
+        })
+        .catch(done.fail);
+    });
+  });
 });

@@ -11,6 +11,8 @@ export default class FileEngine implements CRUDEngine {
   }
 
   create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
+    // TODO: Serialize records so that binary data can be saved too.
+    // TODO: If type of entity is "object", use "JSON.stringify"
     const file: string = path.normalize(`${this.storeName}/${tableName}/${primaryKey}.dat`);
     return fs.outputFile(file, entity).then(() => primaryKey);
   }
@@ -63,7 +65,7 @@ export default class FileEngine implements CRUDEngine {
     return new Promise((resolve, reject) => {
       fs.readdir(directory, (error, files) => {
         if (error) {
-          if(error.code === 'ENOENT') {
+          if (error.code === 'ENOENT') {
             resolve([]);
           } else {
             reject(error);
@@ -76,9 +78,16 @@ export default class FileEngine implements CRUDEngine {
     });
   }
 
+  // TODO: Make this function also work for binary data.
   update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     return this.read(tableName, primaryKey)
-      .then((record: any) => Object.assign({}, record))
+      .then((record: any) => {
+        if (typeof record === 'string') {
+          record = JSON.parse(record);
+        }
+        const updatedRecord: Object = Object.assign(record, changes);
+        return JSON.stringify(updatedRecord);
+      })
       .then((updatedRecord: any) => this.create(tableName, primaryKey, updatedRecord));
   }
 }

@@ -145,6 +145,8 @@ engine.readAllPrimaryKeys(TABLE_NAME).then((primaryKeys) => {
 });
 ```
 
+### update
+
 ```javascript
 engine.update(TABLE_NAME, PRIMARY_KEY, {brother: 'Bart Simpson'}).then((primaryKey) => {
   return engine.read(TABLE_NAME, PRIMARY_KEY);

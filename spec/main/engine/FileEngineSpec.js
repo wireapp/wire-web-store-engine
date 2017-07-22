@@ -51,7 +51,23 @@ describe('StoreEngine.FileEngine', () => {
   });
 
   describe('"delete"', () => {
-    it('deletes an entity.', (done) => {
+    it('returns the primary key of a deleted record.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then((primaryKey) => engine.delete(TABLE_NAME, primaryKey))
+        .then((primaryKey) => {
+          expect(primaryKey).toBe(PRIMARY_KEY);
+          done();
+        });
+    });
+
+    it('deletes a record.', (done) => {
       const TABLE_NAME = 'table-name';
 
       const homer = {
@@ -95,7 +111,7 @@ describe('StoreEngine.FileEngine', () => {
   });
 
   describe('"deleteAll"', () => {
-    it('deletes all entities.', (done) => {
+    it('deletes all records from a database table.', (done) => {
       const TABLE_NAME = 'table-name';
 
       const homer = {
@@ -128,7 +144,10 @@ describe('StoreEngine.FileEngine', () => {
         engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
       ])
       .then(() => engine.deleteAll(TABLE_NAME))
-      .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
+      .then((hasBeenDeleted) => {
+        expect(hasBeenDeleted).toBe(true);
+        return engine.readAllPrimaryKeys(TABLE_NAME);
+      })
       .then((primaryKeys) => {
         expect(primaryKeys.length).toBe(0);
         done();

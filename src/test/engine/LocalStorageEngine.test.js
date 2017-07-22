@@ -27,9 +27,7 @@ describe('StoreEngine.LocalStorageEngine', () => {
     engine = new StoreEngine.LocalStorageEngine(DATABASE_NAME);
   });
 
-  afterEach(() => {
-    window.localStorage.clear();
-  });
+  afterEach(() => window.localStorage.clear());
 
   describe('"create"', () => {
     it('creates a serialized database record.', (done) => {
@@ -41,11 +39,11 @@ describe('StoreEngine.LocalStorageEngine', () => {
       };
 
       engine.create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
-        .then((record) => {
-          expect(record.some).toBe(entity.some);
+        .then((primaryKey) => {
+          expect(primaryKey).toEqual(PRIMARY_KEY);
           done();
-        });
+        })
+        .catch(done.fail);
     });
 
     it('overwrites an existing database record.', (done) => {
@@ -178,11 +176,11 @@ describe('StoreEngine.LocalStorageEngine', () => {
         engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
         engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
       ])
-      .then(() => engine.readAll(TABLE_NAME))
-      .then((records) => {
-        expect(records.length).toBe(3);
-        done();
-      });
+        .then(() => engine.readAll(TABLE_NAME))
+        .then((records) => {
+          expect(records.length).toBe(3);
+          done();
+        });
     });
   });
 

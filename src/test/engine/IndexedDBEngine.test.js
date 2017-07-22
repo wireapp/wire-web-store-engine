@@ -19,7 +19,7 @@
 
 import {StoreEngine} from '../../../dist/commonjs';
 
-describe('StoreEngine.LocalStorageEngine', () => {
+describe('StoreEngine.IndexedDBEngine', () => {
   const DATABASE_NAME = 'database-name';
   let engine = undefined;
 

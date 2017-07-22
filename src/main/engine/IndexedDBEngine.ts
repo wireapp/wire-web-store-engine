@@ -2,10 +2,10 @@ import CRUDEngine from './CRUDEngine';
 import Dexie from 'dexie';
 
 export default class IndexedDBEngine implements CRUDEngine {
-  private db: Dexie;
+  public storeName: string;
 
-  constructor(public storeName: string) {
-    this.db = new Dexie(storeName);
+  constructor(private db: Dexie) {
+    this.storeName = db.name;
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {

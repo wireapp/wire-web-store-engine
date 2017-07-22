@@ -1,7 +1,6 @@
 import * as fs from 'fs-extra';
 import CRUDEngine from './CRUDEngine';
 import path = require('path');
-import {RecordNotFoundError} from './error';
 
 export default class FileEngine implements CRUDEngine {
   public storeName: string;
@@ -40,7 +39,7 @@ export default class FileEngine implements CRUDEngine {
       fs.readFile(file, {encoding: 'utf8', flag: 'r'}, function (error, data: any) {
         if (error) {
           if (error.code === 'ENOENT') {
-            reject(new RecordNotFoundError(`Record "${primaryKey}" from file "${file}" could not be found.`));
+            resolve(undefined);
           } else {
             reject(error);
           }

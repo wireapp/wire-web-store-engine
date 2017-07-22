@@ -172,6 +172,18 @@ describe('StoreEngine.FileEngine', () => {
         })
         .catch((error) => done.fail(error)));
     });
+
+    it('returns "undefined" if a record cannot be found.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      engine.read(TABLE_NAME, PRIMARY_KEY)
+      .then((record) => {
+        expect(record).toBeUndefined();
+        done();
+      })
+      .catch((error) => done.fail(error));
+    });
   });
 
   describe('"readAll"', () => {

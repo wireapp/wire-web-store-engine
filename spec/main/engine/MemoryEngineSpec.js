@@ -69,7 +69,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'homer-simpson',
         entity: {
           firstName: 'Homer',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -77,7 +77,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'lisa-simpson',
         entity: {
           firstName: 'Lisa',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -85,7 +85,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'marge-simpson',
         entity: {
           firstName: 'Marge',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -113,7 +113,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'homer-simpson',
         entity: {
           firstName: 'Homer',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -121,7 +121,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'lisa-simpson',
         entity: {
           firstName: 'Lisa',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -129,7 +129,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'marge-simpson',
         entity: {
           firstName: 'Marge',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -189,7 +189,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'homer-simpson',
         entity: {
           firstName: 'Homer',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -197,7 +197,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'lisa-simpson',
         entity: {
           firstName: 'Lisa',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -205,7 +205,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'marge-simpson',
         entity: {
           firstName: 'Marge',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -233,7 +233,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'homer-simpson',
         entity: {
           firstName: 'Homer',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -241,7 +241,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'lisa-simpson',
         entity: {
           firstName: 'Lisa',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -249,7 +249,7 @@ describe('StoreEngine.MemoryEngine', () => {
         primaryKey: 'marge-simpson',
         entity: {
           firstName: 'Marge',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 

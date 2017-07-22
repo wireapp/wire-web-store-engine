@@ -27,9 +27,7 @@ describe('StoreEngine.LocalStorageEngine', () => {
     engine = new StoreEngine.LocalStorageEngine(DATABASE_NAME);
   });
 
-  afterEach(() => {
-    window.localStorage.clear();
-  });
+  afterEach(() => window.localStorage.clear());
 
   describe('"create"', () => {
     it('creates a serialized database record.', (done) => {
@@ -41,11 +39,11 @@ describe('StoreEngine.LocalStorageEngine', () => {
       };
 
       engine.create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
-        .then((record) => {
-          expect(record.some).toBe(entity.some);
+        .then((primaryKey) => {
+          expect(primaryKey).toEqual(PRIMARY_KEY);
           done();
-        });
+        })
+        .catch(done.fail);
     });
 
     it('overwrites an existing database record.', (done) => {
@@ -86,47 +84,92 @@ describe('StoreEngine.LocalStorageEngine', () => {
           done();
         });
     });
+
+    it('deletes a record.', (done) => {
+      const TABLE_NAME = 'table-name';
+
+      const homer = {
+        primaryKey: 'homer-simpson',
+        entity: {
+          firstName: 'Homer',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const lisa = {
+        primaryKey: 'lisa-simpson',
+        entity: {
+          firstName: 'Lisa',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const marge = {
+        primaryKey: 'marge-simpson',
+        entity: {
+          firstName: 'Marge',
+          lastNme: 'Simpson'
+        }
+      };
+
+      Promise.all([
+        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
+        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
+        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
+      ])
+        .then(() => engine.delete(TABLE_NAME, lisa.primaryKey))
+        .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
+        .then((primaryKeys) => {
+          expect(primaryKeys.length).toBe(2);
+          expect(primaryKeys[0]).toBe(homer.primaryKey);
+          expect(primaryKeys[1]).toBe(marge.primaryKey);
+          done();
+        });
+    });
   });
 
   describe('"deleteAll"', () => {
     it('deletes all records from a database table.', (done) => {
       const TABLE_NAME = 'table-name';
 
-      const firstPayload = {
-        primaryKey: 'primary-key-1',
+      const homer = {
+        primaryKey: 'homer-simpson',
         entity: {
-          value: 72
+          firstName: 'Homer',
+          lastNme: 'Simpson'
         }
       };
 
-      const secondPayload = {
-        primaryKey: 'primary-key-2',
+      const lisa = {
+        primaryKey: 'lisa-simpson',
         entity: {
-          value: 73
+          firstName: 'Lisa',
+          lastNme: 'Simpson'
         }
       };
 
-      const thirdPayload = {
-        primaryKey: 'primary-key-3',
+      const marge = {
+        primaryKey: 'marge-simpson',
         entity: {
-          value: 'ABC'
+          firstName: 'Marge',
+          lastNme: 'Simpson'
         }
       };
 
       Promise.all([
-        engine.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
-        engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
-        engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
+        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
+        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
+        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
       ])
-        .then(() => engine.deleteAll(TABLE_NAME))
-        .then((hasBeenDeleted) => {
-          expect(hasBeenDeleted).toBe(true);
-          return engine.readAll(TABLE_NAME);
-        })
-        .then((records) => {
-          expect(records.length).toBe(0);
-          done();
-        });
+      .then(() => engine.deleteAll(TABLE_NAME))
+      .then((hasBeenDeleted) => {
+        expect(hasBeenDeleted).toBe(true);
+        return engine.readAllPrimaryKeys(TABLE_NAME);
+      })
+      .then((primaryKeys) => {
+        expect(primaryKeys.length).toBe(0);
+        done();
+      });
     });
   });
 
@@ -146,41 +189,103 @@ describe('StoreEngine.LocalStorageEngine', () => {
           done();
         });
     });
+
+    it('returns "undefined" if a record cannot be found.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      engine.read(TABLE_NAME, PRIMARY_KEY)
+        .then((record) => {
+          expect(record).toBeUndefined();
+          done();
+        })
+        .catch((error) => done.fail(error));
+    });
   });
 
   describe('"readAll"', () => {
     it('returns multiple database records.', (done) => {
       const TABLE_NAME = 'table-name';
 
-      const firstPayload = {
-        primaryKey: 'primary-key-1',
+      const homer = {
+        primaryKey: 'homer-simpson',
         entity: {
-          value: 72
+          firstName: 'Homer',
+          lastNme: 'Simpson'
         }
       };
 
-      const secondPayload = {
-        primaryKey: 'primary-key-2',
+      const lisa = {
+        primaryKey: 'lisa-simpson',
         entity: {
-          value: 73
+          firstName: 'Lisa',
+          lastNme: 'Simpson'
         }
       };
 
-      const thirdPayload = {
-        primaryKey: 'primary-key-3',
+      const marge = {
+        primaryKey: 'marge-simpson',
         entity: {
-          value: 'ABC'
+          firstName: 'Marge',
+          lastNme: 'Simpson'
         }
       };
 
       Promise.all([
-        engine.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
-        engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
-        engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
+        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
+        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
+        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
       ])
       .then(() => engine.readAll(TABLE_NAME))
       .then((records) => {
         expect(records.length).toBe(3);
+        expect(records[0].firstName).toBe(homer.entity.firstName);
+        expect(records[1].firstName).toBe(lisa.entity.firstName);
+        expect(records[2].firstName).toBe(marge.entity.firstName);
+        done();
+      });
+    });
+  });
+
+  describe('"readAllPrimaryKeys"', () => {
+    it('gets the primary keys of all records in a table.', (done) => {
+      const TABLE_NAME = 'table-name';
+
+      const homer = {
+        primaryKey: 'homer-simpson',
+        entity: {
+          firstName: 'Homer',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const lisa = {
+        primaryKey: 'lisa-simpson',
+        entity: {
+          firstName: 'Lisa',
+          lastNme: 'Simpson'
+        }
+      };
+
+      const marge = {
+        primaryKey: 'marge-simpson',
+        entity: {
+          firstName: 'Marge',
+          lastNme: 'Simpson'
+        }
+      };
+
+      Promise.all([
+        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
+        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
+        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
+      ])
+      .then(() => engine.readAllPrimaryKeys(TABLE_NAME))
+      .then((primaryKeys) => {
+        expect(primaryKeys.length).toBe(3);
+        expect(primaryKeys[0]).toBe(homer.primaryKey);
+        expect(primaryKeys[1]).toBe(lisa.primaryKey);
+        expect(primaryKeys[2]).toBe(marge.primaryKey);
         done();
       });
     });
@@ -213,7 +318,8 @@ describe('StoreEngine.LocalStorageEngine', () => {
           expect(updatedRecord.size.height).toBe(updates.size.height);
           expect(updatedRecord.size.width).toBe(updates.size.width);
           done();
-        });
+        })
+        .catch(done.fail);
     });
   });
 });

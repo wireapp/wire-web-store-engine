@@ -9,7 +9,14 @@ export default class IndexedDBEngine implements CRUDEngine {
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
-    return this.db[tableName].add(entity, primaryKey);
+    return this.db[tableName].add(entity, primaryKey)
+      .catch((error) => {
+        if (error.name === 'ConstraintError') {
+          return this.delete(tableName, primaryKey).then(() => this.create(tableName, primaryKey, entity));
+        } else {
+          throw error;
+        }
+      })
   }
 
   public delete(tableName: string, primaryKey: string): Promise<string> {

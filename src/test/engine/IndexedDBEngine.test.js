@@ -17,6 +17,7 @@
  *
  */
 
+import Dexie from 'dexie';
 import {StoreEngine} from '../../../dist/commonjs';
 
 describe('StoreEngine.IndexedDBEngine', () => {
@@ -27,20 +28,28 @@ describe('StoreEngine.IndexedDBEngine', () => {
 
   beforeEach(() => {
     const db = new Dexie(DATABASE_NAME);
-    db.version(1).stores((
-      obj = {},
-        obj['' + TABLE_NAME] = ',firstName,lastName',
-        obj
-    ));
+    db.version(1).stores({
+      "the-simpsons": ',firstName,lastName'
+    });
     engine = new StoreEngine.IndexedDBEngine(db);
   });
 
   afterEach(() => window.indexedDB.deleteDatabase(DATABASE_NAME));
 
   describe('"create"', () => {
-    it('works.', (done) => {
-      expect('A').toBe('A');
-      done();
+    it('creates a serialized database record.', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then((primaryKey) => {
+          expect(primaryKey).toEqual(PRIMARY_KEY);
+          done();
+        })
+        .catch(done.fail);
     });
   });
 });

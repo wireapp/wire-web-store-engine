@@ -3,17 +3,18 @@ const path = require('path');
 const {StoreEngine} = require('../../../dist/commonjs');
 
 describe('StoreEngine.FileEngine', () => {
-  const TEST_DIRECTORY = path.normalize(`${__dirname}/../../temp`);
-  const DATABASE_NAME = TEST_DIRECTORY;
+  const DATABASE_NAME = 'database-name';
+  const TABLE_NAME = 'the-simpsons';
+
+  const TEST_DIRECTORY = path.normalize(`${__dirname}/../../temp/${DATABASE_NAME}`);
   let engine = undefined;
 
-  beforeEach(() => engine = new StoreEngine.FileEngine(DATABASE_NAME));
+  beforeEach(() => engine = new StoreEngine.FileEngine(TEST_DIRECTORY));
 
   afterEach((done) => fs.remove(TEST_DIRECTORY).then(done).catch(done.fail));
 
   describe('"create"', () => {
     it('creates a serialized database record.', (done) => {
-      const TABLE_NAME = 'table-name';
       const PRIMARY_KEY = 'primary-key';
 
       const entity = {
@@ -29,7 +30,6 @@ describe('StoreEngine.FileEngine', () => {
     });
 
     it('overwrites an existing database record.', (done) => {
-      const TABLE_NAME = 'table-name';
       const PRIMARY_KEY = 'primary-key';
 
       const firstEntity = {
@@ -52,7 +52,6 @@ describe('StoreEngine.FileEngine', () => {
 
   describe('"delete"', () => {
     it('returns the primary key of a deleted record.', (done) => {
-      const TABLE_NAME = 'table-name';
       const PRIMARY_KEY = 'primary-key';
 
       const entity = {
@@ -68,13 +67,11 @@ describe('StoreEngine.FileEngine', () => {
     });
 
     it('deletes a record.', (done) => {
-      const TABLE_NAME = 'table-name';
-
       const homer = {
         primaryKey: 'homer-simpson',
         entity: {
           firstName: 'Homer',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -82,7 +79,7 @@ describe('StoreEngine.FileEngine', () => {
         primaryKey: 'lisa-simpson',
         entity: {
           firstName: 'Lisa',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -90,7 +87,7 @@ describe('StoreEngine.FileEngine', () => {
         primaryKey: 'marge-simpson',
         entity: {
           firstName: 'Marge',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -112,13 +109,11 @@ describe('StoreEngine.FileEngine', () => {
 
   describe('"deleteAll"', () => {
     it('deletes all records from a database table.', (done) => {
-      const TABLE_NAME = 'table-name';
-
       const homer = {
         primaryKey: 'homer-simpson',
         entity: {
           firstName: 'Homer',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -126,7 +121,7 @@ describe('StoreEngine.FileEngine', () => {
         primaryKey: 'lisa-simpson',
         entity: {
           firstName: 'Lisa',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -134,7 +129,7 @@ describe('StoreEngine.FileEngine', () => {
         primaryKey: 'marge-simpson',
         entity: {
           firstName: 'Marge',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -157,7 +152,6 @@ describe('StoreEngine.FileEngine', () => {
 
   describe('"read"', () => {
     it('returns a database record.', (done) => {
-      const TABLE_NAME = 'table-name';
       const PRIMARY_KEY = 'primary-key';
 
       const entity = {
@@ -174,7 +168,6 @@ describe('StoreEngine.FileEngine', () => {
     });
 
     it('returns "undefined" if a record cannot be found.', (done) => {
-      const TABLE_NAME = 'table-name';
       const PRIMARY_KEY = 'primary-key';
 
       engine.read(TABLE_NAME, PRIMARY_KEY)
@@ -188,13 +181,11 @@ describe('StoreEngine.FileEngine', () => {
 
   describe('"readAll"', () => {
     it('returns multiple database records.', (done) => {
-      const TABLE_NAME = 'table-name';
-
       const homer = {
         primaryKey: 'homer-simpson',
         entity: {
           firstName: 'Homer',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -202,7 +193,7 @@ describe('StoreEngine.FileEngine', () => {
         primaryKey: 'lisa-simpson',
         entity: {
           firstName: 'Lisa',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -210,7 +201,7 @@ describe('StoreEngine.FileEngine', () => {
         primaryKey: 'marge-simpson',
         entity: {
           firstName: 'Marge',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -232,13 +223,11 @@ describe('StoreEngine.FileEngine', () => {
 
   describe('"readAllPrimaryKeys"', () => {
     it('gets the primary keys of all records in a table.', (done) => {
-      const TABLE_NAME = 'table-name';
-
       const homer = {
         primaryKey: 'homer-simpson',
         entity: {
           firstName: 'Homer',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -246,7 +235,7 @@ describe('StoreEngine.FileEngine', () => {
         primaryKey: 'lisa-simpson',
         entity: {
           firstName: 'Lisa',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -254,7 +243,7 @@ describe('StoreEngine.FileEngine', () => {
         primaryKey: 'marge-simpson',
         entity: {
           firstName: 'Marge',
-          lastNme: 'Simpson'
+          lastName: 'Simpson'
         }
       };
 
@@ -276,7 +265,6 @@ describe('StoreEngine.FileEngine', () => {
 
   describe('"update"', () => {
     it('updates an existing database record.', (done) => {
-      const TABLE_NAME = 'table-name';
       const PRIMARY_KEY = 'primary-key';
 
       const entity = {

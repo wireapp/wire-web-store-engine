@@ -2,14 +2,21 @@ import CRUDEngine from './CRUDEngine';
 import Dexie from 'dexie';
 
 export default class IndexedDBEngine implements CRUDEngine {
-  private db: Dexie;
+  public storeName: string;
 
-  constructor(public storeName: string) {
-    this.db = new Dexie(storeName);
+  constructor(private db: Dexie) {
+    this.storeName = db.name;
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
-    return this.db[tableName].add(entity, primaryKey);
+    return this.db[tableName].add(entity, primaryKey)
+      .catch((error) => {
+        if (error.name === 'ConstraintError') {
+          return this.delete(tableName, primaryKey).then(() => this.create(tableName, primaryKey, entity));
+        } else {
+          throw error;
+        }
+      })
   }
 
   public delete(tableName: string, primaryKey: string): Promise<string> {

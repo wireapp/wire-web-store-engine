@@ -1,12 +1,10 @@
 const {StoreEngine} = require('../../../dist/commonjs');
 
-describe('StoreEngine.InMemoryEngine', () => {
+describe('StoreEngine.MemoryEngine', () => {
   const DATABASE_NAME = 'database-name';
   let engine = undefined;
 
-  beforeEach(() => {
-    engine = new StoreEngine.InMemoryEngine(DATABASE_NAME);
-  });
+  beforeEach(() => engine = new StoreEngine.MemoryEngine(DATABASE_NAME));
 
   describe('"create"', () => {
     it('creates a serialized database record.', (done) => {

@@ -1,13 +1,13 @@
 import CRUDEngine from './CRUDEngine';
 import FileEngine from './FileEngine';
 import IndexedDBEngine from './IndexedDBEngine';
-import InMemoryEngine from './InMemoryEngine';
+import MemoryEngine from './MemoryEngine';
 import LocalStorageEngine from './LocalStorageEngine';
 
 export {
   CRUDEngine,
   FileEngine,
   IndexedDBEngine,
-  InMemoryEngine,
+  MemoryEngine,
   LocalStorageEngine,
 };

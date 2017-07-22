@@ -25,7 +25,28 @@ describe('StoreEngine.FileEngine', () => {
           expect(primaryKey).toEqual(PRIMARY_KEY);
           done();
         })
-        .catch((error) => done.fail(error));
+        .catch(done.fail);
+    });
+
+    it('overwrites an existing database record.', (done) => {
+      const TABLE_NAME = 'table-name';
+      const PRIMARY_KEY = 'primary-key';
+
+      const firstEntity = {
+        some: 'value'
+      };
+
+      const secondEntity = {
+        some: 'newer-value'
+      };
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, firstEntity)
+        .then(() => engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity))
+        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
+        .then((record) => {
+          expect(record.some).toBe(secondEntity.some);
+          done();
+        });
     });
   });
 
@@ -127,9 +148,7 @@ describe('StoreEngine.FileEngine', () => {
       engine.create(TABLE_NAME, PRIMARY_KEY, entity)
         .then((primaryKey) => engine.read(TABLE_NAME, primaryKey)
         .then((record) => {
-          // TODO: Update "FileEngine" implementation so that "JSON.parse" is not needed in test.
-          const data = JSON.parse(record);
-          expect(data.some).toEqual(entity.some);
+          expect(record.some).toEqual(entity.some);
           done();
         })
         .catch((error) => done.fail(error)));
@@ -172,10 +191,9 @@ describe('StoreEngine.FileEngine', () => {
       .then(() => engine.readAll(TABLE_NAME))
       .then((records) => {
         expect(records.length).toBe(3);
-        // TODO: Update "FileEngine" implementation so that "JSON.parse" is not needed in test.
-        expect(JSON.parse(records[0]).firstName).toBe(homer.entity.firstName);
-        expect(JSON.parse(records[1]).firstName).toBe(lisa.entity.firstName);
-        expect(JSON.parse(records[2]).firstName).toBe(marge.entity.firstName);
+        expect(records[0].firstName).toBe(homer.entity.firstName);
+        expect(records[1].firstName).toBe(lisa.entity.firstName);
+        expect(records[2].firstName).toBe(marge.entity.firstName);
         done();
       });
     });
@@ -246,8 +264,6 @@ describe('StoreEngine.FileEngine', () => {
         .then(() => engine.update(TABLE_NAME, PRIMARY_KEY, updates))
         .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
         .then((updatedRecord) => {
-          // TODO: Update "FileEngine" implementation so that "JSON.parse" is not needed in test.
-          updatedRecord = JSON.parse(updatedRecord);
           expect(updatedRecord.name).toBe(entity.name);
           expect(updatedRecord.age).toBe(updates.age);
           expect(Object.keys(updatedRecord.size).length).toBe(2);

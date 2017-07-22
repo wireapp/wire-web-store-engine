@@ -16,7 +16,7 @@ export default class FileEngine implements CRUDEngine {
     if (typeof entity === 'object') {
       try {
         entity = JSON.stringify(entity);
-      } catch(error) {
+      } catch (error) {
         entity = entity.toString();
       }
     }
@@ -45,6 +45,10 @@ export default class FileEngine implements CRUDEngine {
             reject(error);
           }
         } else {
+          try {
+            data = JSON.parse(data);
+          } catch (error) {
+          }
           resolve(data);
         }
       });

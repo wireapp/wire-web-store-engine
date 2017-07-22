@@ -1,5 +1,5 @@
 import {ExpiredBundle, RecordAlreadyExistsError, TransientBundle, TransientStore} from './store';
-import {FileEngine, IndexedDBEngine, InMemoryEngine, LocalStorageEngine} from './engine';
+import {FileEngine, IndexedDBEngine, MemoryEngine, LocalStorageEngine} from './engine';
 
 export = {
   Store: {
@@ -11,7 +11,7 @@ export = {
   StoreEngine: {
     FileEngine,
     IndexedDBEngine,
-    InMemoryEngine,
+    MemoryEngine,
     LocalStorageEngine,
   }
 };

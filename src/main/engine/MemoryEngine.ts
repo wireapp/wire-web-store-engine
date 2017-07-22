@@ -1,6 +1,6 @@
 import CRUDEngine from './CRUDEngine';
 
-export default class InMemoryEngine implements CRUDEngine {
+export default class MemoryEngine implements CRUDEngine {
   private stores: { [index: string]: { [index: string]: any } } = {};
 
   constructor(public storeName: string) {

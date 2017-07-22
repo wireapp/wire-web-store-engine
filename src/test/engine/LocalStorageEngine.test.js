@@ -192,40 +192,46 @@ describe('StoreEngine.LocalStorageEngine', () => {
   });
 
   describe('"readAll"', () => {
-    it('returns multiple database records.', (done) => {
+    fit('returns multiple database records.', (done) => {
       const TABLE_NAME = 'table-name';
 
-      const firstPayload = {
-        primaryKey: 'primary-key-1',
+      const homer = {
+        primaryKey: 'homer-simpson',
         entity: {
-          value: 72
+          firstName: 'Homer',
+          lastNme: 'Simpson'
         }
       };
 
-      const secondPayload = {
-        primaryKey: 'primary-key-2',
+      const lisa = {
+        primaryKey: 'lisa-simpson',
         entity: {
-          value: 73
+          firstName: 'Lisa',
+          lastNme: 'Simpson'
         }
       };
 
-      const thirdPayload = {
-        primaryKey: 'primary-key-3',
+      const marge = {
+        primaryKey: 'marge-simpson',
         entity: {
-          value: 'ABC'
+          firstName: 'Marge',
+          lastNme: 'Simpson'
         }
       };
 
       Promise.all([
-        engine.create(TABLE_NAME, firstPayload.primaryKey, firstPayload.entity),
-        engine.create(TABLE_NAME, secondPayload.primaryKey, secondPayload.entity),
-        engine.create(TABLE_NAME, thirdPayload.primaryKey, thirdPayload.entity),
+        engine.create(TABLE_NAME, homer.primaryKey, homer.entity),
+        engine.create(TABLE_NAME, lisa.primaryKey, lisa.entity),
+        engine.create(TABLE_NAME, marge.primaryKey, marge.entity),
       ])
-        .then(() => engine.readAll(TABLE_NAME))
-        .then((records) => {
-          expect(records.length).toBe(3);
-          done();
-        });
+      .then(() => engine.readAll(TABLE_NAME))
+      .then((records) => {
+        expect(records.length).toBe(3);
+        expect(records[0].firstName).toBe(homer.entity.firstName);
+        expect(records[1].firstName).toBe(lisa.entity.firstName);
+        expect(records[2].firstName).toBe(marge.entity.firstName);
+        done();
+      });
     });
   });
 

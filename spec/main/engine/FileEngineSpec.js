@@ -167,7 +167,7 @@ describe('StoreEngine.FileEngine', () => {
       engine.create(TABLE_NAME, PRIMARY_KEY, entity)
         .then((primaryKey) => engine.read(TABLE_NAME, primaryKey)
         .then((record) => {
-          expect(record.some).toEqual(entity.some);
+          expect(record.some).toBe(entity.some);
           done();
         })
         .catch((error) => done.fail(error)));

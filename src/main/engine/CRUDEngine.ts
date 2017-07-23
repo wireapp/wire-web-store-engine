@@ -1,5 +1,4 @@
 interface CRUDEngine {
-  storeName: string;
   create<T>(tableName: string, primaryKey: string, entity: T): Promise<string>;
   // TODO: Implement "createAll"
   delete(tableName: string, primaryKey: string): Promise<string>;

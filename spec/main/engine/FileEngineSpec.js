@@ -6,7 +6,7 @@ describe('StoreEngine.FileEngine', () => {
   const DATABASE_NAME = 'database-name';
   const TABLE_NAME = 'the-simpsons';
 
-  const TEST_DIRECTORY = path.normalize(`${__dirname}/../../temp/${DATABASE_NAME}`);
+  const TEST_DIRECTORY = path.join(process.cwd(), DATABASE_NAME);
   let engine = undefined;
 
   beforeEach(() => engine = new StoreEngine.FileEngine(TEST_DIRECTORY));

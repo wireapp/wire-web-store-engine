@@ -28,7 +28,7 @@ export default class FileEngine implements CRUDEngine {
   create<T>(tableName: string, primaryKey: string, entity: any): Promise<string> {
     return this.securityChecks([tableName, primaryKey]).then(() => {
       // TODO: Implement "base64" serialization to save any kind of data.
-      const file: string = path.join(this.storeName, tableName, primaryKey, this.FILE_EXTENSION);
+      const file: string = path.join(this.storeName, tableName, `${primaryKey}${this.FILE_EXTENSION}`);
 
       if (typeof entity === 'object') {
         try {
@@ -43,7 +43,8 @@ export default class FileEngine implements CRUDEngine {
 
   delete(tableName: string, primaryKey: string): Promise<string> {
     return this.securityChecks([tableName, primaryKey]).then(() => {
-      const file: string = path.join(this.storeName, tableName, primaryKey, this.FILE_EXTENSION);
+      const file: string = path.join(this.storeName, tableName, `${primaryKey}${this.FILE_EXTENSION}`);
+
       return fs.remove(file).then(() => primaryKey).catch(() => false);
     })
   }
@@ -51,13 +52,14 @@ export default class FileEngine implements CRUDEngine {
   deleteAll(tableName: string): Promise<boolean> {
     return this.securityChecks([tableName]).then(() => {
       const directory: string = path.join(this.storeName, tableName);
+
       return fs.remove(directory).then(() => true).catch(() => false);
     });
   }
 
   read<T>(tableName: string, primaryKey: string): Promise<T> {
     return this.securityChecks([tableName, primaryKey]).then(() => {
-      const file: string = path.join(this.storeName, tableName, primaryKey, this.FILE_EXTENSION);
+      const file: string = path.join(this.storeName, tableName, `${primaryKey}${this.FILE_EXTENSION}`);
 
       return new Promise<T>((resolve, reject) => {
         fs.readFile(file, {encoding: 'utf8', flag: 'r'}, (error: any, data: any) => {

@@ -13,6 +13,80 @@ describe('StoreEngine.FileEngine', () => {
 
   afterEach((done) => fs.remove(TEST_DIRECTORY).then(done).catch(done.fail));
 
+  describe('"securityChecks"', () => {
+    it('does not allow path traversal in PRIMARY_KEY (slash)', (done) => {
+      const PRIMARY_KEY = '/etc';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then(() => done.fail())
+        .catch(e => done());
+    });
+
+    it('does not allow path traversal in TABLE_NAME (slash)', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create('/etc', PRIMARY_KEY, entity)
+        .then(() => done.fail())
+        .catch(e => done());
+    });
+
+    it('does not allow path traversal in PRIMARY_KEY (dot)', (done) => {
+      const PRIMARY_KEY = '.etc';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then(() => done.fail())
+        .catch(e => done());
+    });
+
+    it('does not allow path traversal in TABLE_NAME (dot)', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create('.etc', PRIMARY_KEY, entity)
+        .then(() => done.fail())
+        .catch(e => done());
+    });
+
+    it('does not allow path traversal in PRIMARY_KEY (backslash)', (done) => {
+      const PRIMARY_KEY = '\\etc';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then(() => done.fail())
+        .catch(e => done());
+    });
+
+    it('does not allow path traversal in TABLE_NAME (backslash)', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create('\\etc', PRIMARY_KEY, entity)
+        .then(() => done.fail())
+        .catch(e => done());
+    });
+  });
+
   describe('"create"', () => {
     it('creates a serialized database record.', (done) => {
       const PRIMARY_KEY = 'primary-key';

@@ -96,7 +96,7 @@ export default class FileEngine implements CRUDEngine {
     });
   }
 
-  readAllPrimaryKeys(tableName: string): Promise<string[]> {
+  readAllPrimaryKeys(tableName: string): Promise<string[]|object> {
     return this.securityChecks([tableName]).then(() => {
       const directory: string = path.join(this.storeName, tableName);
 

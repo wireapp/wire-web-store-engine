@@ -3,7 +3,7 @@ import CRUDEngine from './CRUDEngine';
 import path = require('path');
 
 export default class FileEngine implements CRUDEngine {
-  private storeName: string;
+  public storeName: string;
   private FILE_EXTENSION: string = '.dat';
 
   constructor(storeName: string) {

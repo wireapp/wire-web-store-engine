@@ -96,17 +96,17 @@ export default class FileEngine implements CRUDEngine {
     });
   }
 
-  readAllPrimaryKeys(tableName: string): Promise<string[]|object> {
+  readAllPrimaryKeys(tableName: string): Promise<string[]> {
     return this.securityChecks([tableName]).then(() => {
       const directory: string = path.join(this.storeName, tableName);
 
-      return new Promise((resolve, reject) => {
+      return new Promise<string[]>(resolve => {
         fs.readdir(directory, (error, files) => {
           if (error) {
             if (error.code === 'ENOENT') {
               resolve([]);
             } else {
-              reject(error);
+              throw new Error(error);
             }
           } else {
             const fileNames: string[] = files.map((file: string) => path.parse(file).name);

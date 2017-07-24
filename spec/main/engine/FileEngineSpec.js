@@ -22,17 +22,17 @@ describe('StoreEngine.FileEngine', () => {
       };
 
       Promise.all([
-        engine.resolvePath('../etc', PRIMARY_KEY).catch(() => false),
-        engine.resolvePath('..\\etc', PRIMARY_KEY).catch(() => false),
-        engine.resolvePath('.etc', PRIMARY_KEY).catch(() => false),
-        engine.resolvePath(TABLE_NAME, '../etc').catch(() => false),
-        engine.resolvePath(TABLE_NAME, '..\\etc').catch(() => false),
-        engine.resolvePath(TABLE_NAME, '.etc').catch(() => false),
+        engine.resolvePath('../etc', PRIMARY_KEY).catch((error) => error),
+        engine.resolvePath('..\\etc', PRIMARY_KEY).catch((error) => error),
+        engine.resolvePath('.etc', PRIMARY_KEY).catch((error) => error),
+        engine.resolvePath(TABLE_NAME, '../etc').catch((error) => error),
+        engine.resolvePath(TABLE_NAME, '..\\etc').catch((error) => error),
+        engine.resolvePath(TABLE_NAME, '.etc').catch((error) => error),
       ])
       .then((results) => {
         expect(results.length).toBe(6);
-        for (result of results) {
-          expect(result).toBe(false);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
         }
         done();
       });
@@ -83,17 +83,17 @@ describe('StoreEngine.FileEngine', () => {
       };
 
       Promise.all([
-        engine.create('../etc', PRIMARY_KEY, entity).catch(() => false),
-        engine.create('..\\etc', PRIMARY_KEY, entity).catch(() => false),
-        engine.create('.etc', PRIMARY_KEY, entity).catch(() => false),
-        engine.create(TABLE_NAME, '../etc', entity).catch(() => false),
-        engine.create(TABLE_NAME, '..\\etc', entity).catch(() => false),
-        engine.create(TABLE_NAME, '.etc', entity).catch(() => false),
+        engine.create('../etc', PRIMARY_KEY, entity).catch((error) => error),
+        engine.create('..\\etc', PRIMARY_KEY, entity).catch((error) => error),
+        engine.create('.etc', PRIMARY_KEY, entity).catch((error) => error),
+        engine.create(TABLE_NAME, '../etc', entity).catch((error) => error),
+        engine.create(TABLE_NAME, '..\\etc', entity).catch((error) => error),
+        engine.create(TABLE_NAME, '.etc', entity).catch((error) => error),
       ])
       .then((results) => {
         expect(results.length).toBe(6);
-        for (result of results) {
-          expect(result).toBe(false);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
         }
         done();
       });
@@ -160,17 +160,17 @@ describe('StoreEngine.FileEngine', () => {
       const PRIMARY_KEY = 'primary-key';
 
       Promise.all([
-        engine.delete('../etc', PRIMARY_KEY).catch(() => false),
-        engine.delete('..\\etc', PRIMARY_KEY).catch(() => false),
-        engine.delete('.etc', PRIMARY_KEY).catch(() => false),
-        engine.delete(TABLE_NAME, '../etc').catch(() => false),
-        engine.delete(TABLE_NAME, '..\\etc').catch(() => false),
-        engine.delete(TABLE_NAME, '.etc').catch(() => false),
+        engine.delete('../etc', PRIMARY_KEY).catch((error) => error),
+        engine.delete('..\\etc', PRIMARY_KEY).catch((error) => error),
+        engine.delete('.etc', PRIMARY_KEY).catch((error) => error),
+        engine.delete(TABLE_NAME, '../etc').catch((error) => error),
+        engine.delete(TABLE_NAME, '..\\etc').catch((error) => error),
+        engine.delete(TABLE_NAME, '.etc').catch((error) => error),
       ])
       .then((results) => {
         expect(results.length).toBe(6);
-        for (result of results) {
-          expect(result).toBe(false);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
         }
         done();
       });
@@ -221,14 +221,14 @@ describe('StoreEngine.FileEngine', () => {
 
     it('does not allow path traversal', (done) => {
       Promise.all([
-        engine.deleteAll('../etc').catch(() => false),
-        engine.deleteAll('..\\etc').catch(() => false),
-        engine.deleteAll('.etc').catch(() => false),
+        engine.deleteAll('../etc').catch((error) => error),
+        engine.deleteAll('..\\etc').catch((error) => error),
+        engine.deleteAll('.etc').catch((error) => error),
       ])
       .then((results) => {
         expect(results.length).toBe(3);
-        for (result of results) {
-          expect(result).toBe(false);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
         }
         done();
       });
@@ -267,17 +267,17 @@ describe('StoreEngine.FileEngine', () => {
       const PRIMARY_KEY = 'primary-key';
 
       Promise.all([
-        engine.read('../etc', PRIMARY_KEY).catch(() => false),
-        engine.read('..\\etc', PRIMARY_KEY).catch(() => false),
-        engine.read('.etc', PRIMARY_KEY).catch(() => false),
-        engine.read(TABLE_NAME, '../etc').catch(() => false),
-        engine.read(TABLE_NAME, '..\\etc').catch(() => false),
-        engine.read(TABLE_NAME, '.etc').catch(() => false),
+        engine.read('../etc', PRIMARY_KEY).catch((error) => error),
+        engine.read('..\\etc', PRIMARY_KEY).catch((error) => error),
+        engine.read('.etc', PRIMARY_KEY).catch((error) => error),
+        engine.read(TABLE_NAME, '../etc').catch((error) => error),
+        engine.read(TABLE_NAME, '..\\etc').catch((error) => error),
+        engine.read(TABLE_NAME, '.etc').catch((error) => error),
       ])
       .then((results) => {
         expect(results.length).toBe(6);
-        for (result of results) {
-          expect(result).toBe(false);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
         }
         done();
       });
@@ -327,14 +327,14 @@ describe('StoreEngine.FileEngine', () => {
 
     it('does not allow path traversal', (done) => {
       Promise.all([
-        engine.readAll('../etc').catch(() => false),
-        engine.readAll('..\\etc').catch(() => false),
-        engine.readAll('.etc').catch(() => false),
+        engine.readAll('../etc').catch((error) => error),
+        engine.readAll('..\\etc').catch((error) => error),
+        engine.readAll('.etc').catch((error) => error),
       ])
       .then((results) => {
         expect(results.length).toBe(3);
-        for (result of results) {
-          expect(result).toBe(false);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
         }
         done();
       });
@@ -384,14 +384,14 @@ describe('StoreEngine.FileEngine', () => {
 
     it('does not allow path traversal', (done) => {
       Promise.all([
-        engine.readAllPrimaryKeys('../etc').catch(() => false),
-        engine.readAllPrimaryKeys('..\\etc').catch(() => false),
-        engine.readAllPrimaryKeys('.etc').catch(() => false),
+        engine.readAllPrimaryKeys('../etc').catch((error) => error),
+        engine.readAllPrimaryKeys('..\\etc').catch((error) => error),
+        engine.readAllPrimaryKeys('.etc').catch((error) => error),
       ])
       .then((results) => {
         expect(results.length).toBe(3);
-        for (result of results) {
-          expect(result).toBe(false);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
         }
         done();
       });
@@ -436,17 +436,17 @@ describe('StoreEngine.FileEngine', () => {
       };
 
       Promise.all([
-        engine.update('../etc', PRIMARY_KEY, updates).catch(() => false),
-        engine.update('..\\etc', PRIMARY_KEY, updates).catch(() => false),
-        engine.update('.etc', PRIMARY_KEY, updates).catch(() => false),
-        engine.update(TABLE_NAME, '../etc', updates).catch(() => false),
-        engine.update(TABLE_NAME, '..\\etc', updates).catch(() => false),
-        engine.update(TABLE_NAME, '.etc', updates).catch(() => false),
+        engine.update('../etc', PRIMARY_KEY, updates).catch((error) => error),
+        engine.update('..\\etc', PRIMARY_KEY, updates).catch((error) => error),
+        engine.update('.etc', PRIMARY_KEY, updates).catch((error) => error),
+        engine.update(TABLE_NAME, '../etc', updates).catch((error) => error),
+        engine.update(TABLE_NAME, '..\\etc', updates).catch((error) => error),
+        engine.update(TABLE_NAME, '.etc', updates).catch((error) => error),
       ])
       .then((results) => {
         expect(results.length).toBe(6);
-        for (result of results) {
-          expect(result).toBe(false);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
         }
         done();
       });

@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra';
 import CRUDEngine from './CRUDEngine';
 import path = require('path');
+import {PathValidationError} from './error';
 
 export default class FileEngine implements CRUDEngine {
   constructor(public storeName: string, private options: {fileExtension: string} = {
@@ -22,7 +23,7 @@ export default class FileEngine implements CRUDEngine {
 
     return new Promise((resolve, reject) => {
       if (isPathTraversal(tableName, primaryKey)) {
-        throw new Error('Path traversal has been detected. Aborting.');
+        return reject(new PathValidationError(PathValidationError.TYPE.PATH_TRAVERSAL));
       }
 
       return resolve(path.join(this.storeName, tableName, (primaryKey ? `${primaryKey}${this.options.fileExtension}` : '')));

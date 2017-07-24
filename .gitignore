@@ -1,5 +1,6 @@
 .yarnclean
 /.idea
+/.tmp
 /bower_components
 /dist
 /node_modules

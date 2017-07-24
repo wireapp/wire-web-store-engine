@@ -6,12 +6,38 @@ describe('StoreEngine.FileEngine', () => {
   const DATABASE_NAME = 'database-name';
   const TABLE_NAME = 'the-simpsons';
 
-  const TEST_DIRECTORY = path.normalize(`${__dirname}/../../temp/${DATABASE_NAME}`);
+  const TEST_DIRECTORY = path.join(process.cwd(), '.tmp', DATABASE_NAME);
   let engine = undefined;
 
   beforeEach(() => engine = new StoreEngine.FileEngine(TEST_DIRECTORY));
 
   afterEach((done) => fs.remove(TEST_DIRECTORY).then(done).catch(done.fail));
+
+  describe('"resolvePath"', () => {
+
+    it('properly validate paths', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+      const entity = {
+        some: 'value'
+      };
+
+      Promise.all([
+        engine.resolvePath('../etc', PRIMARY_KEY).catch((error) => error),
+        engine.resolvePath('..\\etc', PRIMARY_KEY).catch((error) => error),
+        engine.resolvePath('.etc', PRIMARY_KEY).catch((error) => error),
+        engine.resolvePath(TABLE_NAME, '../etc').catch((error) => error),
+        engine.resolvePath(TABLE_NAME, '..\\etc').catch((error) => error),
+        engine.resolvePath(TABLE_NAME, '.etc').catch((error) => error),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+        }
+        done();
+      });
+    });
+  });
 
   describe('"create"', () => {
     it('creates a serialized database record.', (done) => {
@@ -47,6 +73,30 @@ describe('StoreEngine.FileEngine', () => {
           expect(record.some).toBe(secondEntity.some);
           done();
         });
+    });
+
+    it('does not allow path traversal', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      Promise.all([
+        engine.create('../etc', PRIMARY_KEY, entity).catch((error) => error),
+        engine.create('..\\etc', PRIMARY_KEY, entity).catch((error) => error),
+        engine.create('.etc', PRIMARY_KEY, entity).catch((error) => error),
+        engine.create(TABLE_NAME, '../etc', entity).catch((error) => error),
+        engine.create(TABLE_NAME, '..\\etc', entity).catch((error) => error),
+        engine.create(TABLE_NAME, '.etc', entity).catch((error) => error),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+        }
+        done();
+      });
     });
   });
 
@@ -105,6 +155,26 @@ describe('StoreEngine.FileEngine', () => {
         done();
       });
     });
+
+    it('does not allow path traversal', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      Promise.all([
+        engine.delete('../etc', PRIMARY_KEY).catch((error) => error),
+        engine.delete('..\\etc', PRIMARY_KEY).catch((error) => error),
+        engine.delete('.etc', PRIMARY_KEY).catch((error) => error),
+        engine.delete(TABLE_NAME, '../etc').catch((error) => error),
+        engine.delete(TABLE_NAME, '..\\etc').catch((error) => error),
+        engine.delete(TABLE_NAME, '.etc').catch((error) => error),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+        }
+        done();
+      });
+    });
   });
 
   describe('"deleteAll"', () => {
@@ -148,6 +218,21 @@ describe('StoreEngine.FileEngine', () => {
         done();
       });
     });
+
+    it('does not allow path traversal', (done) => {
+      Promise.all([
+        engine.deleteAll('../etc').catch((error) => error),
+        engine.deleteAll('..\\etc').catch((error) => error),
+        engine.deleteAll('.etc').catch((error) => error),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(3);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+        }
+        done();
+      });
+    });
   });
 
   describe('"read"', () => {
@@ -176,6 +261,26 @@ describe('StoreEngine.FileEngine', () => {
         done();
       })
       .catch((error) => done.fail(error));
+    });
+
+    it('does not allow path traversal', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      Promise.all([
+        engine.read('../etc', PRIMARY_KEY).catch((error) => error),
+        engine.read('..\\etc', PRIMARY_KEY).catch((error) => error),
+        engine.read('.etc', PRIMARY_KEY).catch((error) => error),
+        engine.read(TABLE_NAME, '../etc').catch((error) => error),
+        engine.read(TABLE_NAME, '..\\etc').catch((error) => error),
+        engine.read(TABLE_NAME, '.etc').catch((error) => error),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+        }
+        done();
+      });
     });
   });
 
@@ -216,6 +321,21 @@ describe('StoreEngine.FileEngine', () => {
         expect(records[0].firstName).toBe(homer.entity.firstName);
         expect(records[1].firstName).toBe(lisa.entity.firstName);
         expect(records[2].firstName).toBe(marge.entity.firstName);
+        done();
+      });
+    });
+
+    it('does not allow path traversal', (done) => {
+      Promise.all([
+        engine.readAll('../etc').catch((error) => error),
+        engine.readAll('..\\etc').catch((error) => error),
+        engine.readAll('.etc').catch((error) => error),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(3);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+        }
         done();
       });
     });
@@ -261,6 +381,21 @@ describe('StoreEngine.FileEngine', () => {
         done();
       });
     });
+
+    it('does not allow path traversal', (done) => {
+      Promise.all([
+        engine.readAllPrimaryKeys('../etc').catch((error) => error),
+        engine.readAllPrimaryKeys('..\\etc').catch((error) => error),
+        engine.readAllPrimaryKeys('.etc').catch((error) => error),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(3);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+        }
+        done();
+      });
+    });
   });
 
   describe('"update"', () => {
@@ -291,6 +426,30 @@ describe('StoreEngine.FileEngine', () => {
           done();
         })
         .catch(done.fail);
+    });
+
+    it('does not allow path traversal', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      const updates = {
+        some: 'value'
+      };
+
+      Promise.all([
+        engine.update('../etc', PRIMARY_KEY, updates).catch((error) => error),
+        engine.update('..\\etc', PRIMARY_KEY, updates).catch((error) => error),
+        engine.update('.etc', PRIMARY_KEY, updates).catch((error) => error),
+        engine.update(TABLE_NAME, '../etc', updates).catch((error) => error),
+        engine.update(TABLE_NAME, '..\\etc', updates).catch((error) => error),
+        engine.update(TABLE_NAME, '.etc', updates).catch((error) => error),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (error of results) {
+          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+        }
+        done();
+      });
     });
   });
 });

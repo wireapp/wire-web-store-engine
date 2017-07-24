@@ -23,7 +23,7 @@ export default class FileEngine implements CRUDEngine {
 
     return new Promise((resolve, reject) => {
       if (isPathTraversal(tableName, primaryKey)) {
-        reject(new PathValidationError(PathValidationError.TYPE.PATH_TRAVERSAL));
+        return reject(new PathValidationError(PathValidationError.TYPE.PATH_TRAVERSAL));
       }
 
       return resolve(path.join(this.storeName, tableName, (primaryKey ? `${primaryKey}${this.options.fileExtension}` : '')));

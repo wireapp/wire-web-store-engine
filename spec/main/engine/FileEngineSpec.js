@@ -76,7 +76,7 @@ describe('StoreEngine.FileEngine', () => {
         });
     });
 
-    fit('does not allow path traversal', (done) => {
+    it('does not allow path traversal', (done) => {
       const PRIMARY_KEY = 'primary-key';
 
       const entity = {

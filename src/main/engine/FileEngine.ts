@@ -3,33 +3,39 @@ import CRUDEngine from './CRUDEngine';
 import path = require('path');
 
 export default class FileEngine implements CRUDEngine {
-  public storeName: string;
-  private FILE_EXTENSION: string = '.dat';
-
-  constructor(storeName: string) {
-    this.storeName = path.normalize(storeName);
+  constructor(public storeName: string, private options: {validatePath: boolean, fileExtension: string} = {
+      validatePath: true,
+      fileExtension: '.dat'
+    }) {
+      this.storeName = path.normalize(storeName);
+      this.options = options;
   }
 
-  private securityChecks(datas: Array<string>): Promise<boolean> {
+  private resolvePath(tableName: string, primaryKey?: string): Promise<string> {
     const isPathTraversal = (pathName: string): boolean => {
       return (pathName.includes('.') || pathName.includes('/') || pathName.includes('\\'));
     };
 
     return new Promise((resolve, reject) => {
-      for (let data of datas) {
-        if (isPathTraversal(data)) {
-          throw new Error('Path traversal has been detected. Aborting.');
+      if (this.options.validatePath) {
+        if (isPathTraversal(tableName)) {
+          throw new Error('Path traversal has been detected in table name. Aborting.');
+        }
+
+        if (primaryKey) {
+          if (isPathTraversal(primaryKey)) {
+            throw new Error('Path traversal has been detected in primary key. Aborting.');
+          }
         }
       }
-      return resolve(true);
+
+      return resolve(path.join(this.storeName, tableName, (primaryKey ? `${primaryKey}${this.options.fileExtension}` : '')));
     });
   }
 
   create<T>(tableName: string, primaryKey: string, entity: any): Promise<string> {
-    return this.securityChecks([tableName, primaryKey]).then(() => {
+    return this.resolvePath(tableName, primaryKey).then(file => {
       // TODO: Implement "base64" serialization to save any kind of data.
-      const file: string = path.join(this.storeName, tableName, `${primaryKey}${this.FILE_EXTENSION}`);
-
       if (typeof entity === 'object') {
         try {
           entity = JSON.stringify(entity);
@@ -42,25 +48,19 @@ export default class FileEngine implements CRUDEngine {
   }
 
   delete(tableName: string, primaryKey: string): Promise<string> {
-    return this.securityChecks([tableName, primaryKey]).then(() => {
-      const file: string = path.join(this.storeName, tableName, `${primaryKey}${this.FILE_EXTENSION}`);
-
+    return this.resolvePath(tableName, primaryKey).then(file => {
       return fs.remove(file).then(() => primaryKey).catch(() => false);
     })
   }
 
   deleteAll(tableName: string): Promise<boolean> {
-    return this.securityChecks([tableName]).then(() => {
-      const directory: string = path.join(this.storeName, tableName);
-
+    return this.resolvePath(tableName).then(directory => {
       return fs.remove(directory).then(() => true).catch(() => false);
     });
   }
 
   read<T>(tableName: string, primaryKey: string): Promise<T> {
-    return this.securityChecks([tableName, primaryKey]).then(() => {
-      const file: string = path.join(this.storeName, tableName, `${primaryKey}${this.FILE_EXTENSION}`);
-
+    return this.resolvePath(tableName, primaryKey).then(file => {
       return new Promise<T>((resolve, reject) => {
         fs.readFile(file, {encoding: 'utf8', flag: 'r'}, (error: any, data: any) => {
           if (error) {
@@ -81,9 +81,7 @@ export default class FileEngine implements CRUDEngine {
   }
 
   readAll<T>(tableName: string): Promise<T[]> {
-    return this.securityChecks([tableName]).then(() => {
-      const directory: string = path.join(this.storeName, tableName);
-
+    return this.resolvePath(tableName).then(directory => {
       return new Promise<T[]>((resolve, reject) => {
         fs.readdir(directory, (error, files) => {
           if (error) {
@@ -99,9 +97,7 @@ export default class FileEngine implements CRUDEngine {
   }
 
   readAllPrimaryKeys(tableName: string): Promise<string[]> {
-    return this.securityChecks([tableName]).then(() => {
-      const directory: string = path.join(this.storeName, tableName);
-
+    return this.resolvePath(tableName).then(directory => {
       return new Promise<string[]>(resolve => {
         fs.readdir(directory, (error, files) => {
           if (error) {
@@ -121,7 +117,7 @@ export default class FileEngine implements CRUDEngine {
 
   // TODO: Make this function also work for binary data.
   update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
-    return this.securityChecks([tableName, primaryKey]).then(() => {
+    return this.resolvePath(tableName, primaryKey).then(file => {
       return this.read(tableName, primaryKey)
         .then((record: any) => {
           if (typeof record === 'string') {

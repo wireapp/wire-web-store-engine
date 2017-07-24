@@ -13,77 +13,29 @@ describe('StoreEngine.FileEngine', () => {
 
   afterEach((done) => fs.remove(TEST_DIRECTORY).then(done).catch(done.fail));
 
-  describe('"securityChecks"', () => {
-    it('does not allow path traversal in PRIMARY_KEY (slash)', (done) => {
-      const PRIMARY_KEY = '/etc';
+  describe('"validatePaths"', () => {
 
-      const entity = {
-        some: 'value'
-      };
-
-      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then(() => done.fail())
-        .catch(e => done());
-    });
-
-    it('does not allow path traversal in TABLE_NAME (slash)', (done) => {
+    it('properly validate paths', (done) => {
       const PRIMARY_KEY = 'primary-key';
-
       const entity = {
         some: 'value'
       };
 
-      engine.create('/etc', PRIMARY_KEY, entity)
-        .then(() => done.fail())
-        .catch(e => done());
-    });
-
-    it('does not allow path traversal in PRIMARY_KEY (dot)', (done) => {
-      const PRIMARY_KEY = '.etc';
-
-      const entity = {
-        some: 'value'
-      };
-
-      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then(() => done.fail())
-        .catch(e => done());
-    });
-
-    it('does not allow path traversal in TABLE_NAME (dot)', (done) => {
-      const PRIMARY_KEY = 'primary-key';
-
-      const entity = {
-        some: 'value'
-      };
-
-      engine.create('.etc', PRIMARY_KEY, entity)
-        .then(() => done.fail())
-        .catch(e => done());
-    });
-
-    it('does not allow path traversal in PRIMARY_KEY (backslash)', (done) => {
-      const PRIMARY_KEY = '\\etc';
-
-      const entity = {
-        some: 'value'
-      };
-
-      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
-        .then(() => done.fail())
-        .catch(e => done());
-    });
-
-    it('does not allow path traversal in TABLE_NAME (backslash)', (done) => {
-      const PRIMARY_KEY = 'primary-key';
-
-      const entity = {
-        some: 'value'
-      };
-
-      engine.create('\\etc', PRIMARY_KEY, entity)
-        .then(() => done.fail())
-        .catch(e => done());
+      Promise.all([
+        engine.create('../etc', PRIMARY_KEY, entity).catch(() => false),
+        engine.create('..\\etc', PRIMARY_KEY, entity).catch(() => false),
+        engine.create('.etc', PRIMARY_KEY, entity).catch(() => false),
+        engine.create(TABLE_NAME, '../etc', entity).catch(() => false),
+        engine.create(TABLE_NAME, '..\\etc', entity).catch(() => false),
+        engine.create(TABLE_NAME, '.etc', entity).catch(() => false),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (result of results) {
+          expect(result).toBe(false);
+        }
+        done();
+      });
     });
   });
 
@@ -121,6 +73,30 @@ describe('StoreEngine.FileEngine', () => {
           expect(record.some).toBe(secondEntity.some);
           done();
         });
+    });
+
+    it('does not allow path traversal', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      Promise.all([
+        engine.create('../etc', PRIMARY_KEY, entity).catch(() => false),
+        engine.create('..\\etc', PRIMARY_KEY, entity).catch(() => false),
+        engine.create('.etc', PRIMARY_KEY, entity).catch(() => false),
+        engine.create(TABLE_NAME, '../etc', entity).catch(() => false),
+        engine.create(TABLE_NAME, '..\\etc', entity).catch(() => false),
+        engine.create(TABLE_NAME, '.etc', entity).catch(() => false),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (result of results) {
+          expect(result).toBe(false);
+        }
+        done();
+      });
     });
   });
 
@@ -179,6 +155,26 @@ describe('StoreEngine.FileEngine', () => {
         done();
       });
     });
+
+    it('does not allow path traversal', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      Promise.all([
+        engine.delete('../etc', PRIMARY_KEY).catch(() => false),
+        engine.delete('..\\etc', PRIMARY_KEY).catch(() => false),
+        engine.delete('.etc', PRIMARY_KEY).catch(() => false),
+        engine.delete(TABLE_NAME, '../etc').catch(() => false),
+        engine.delete(TABLE_NAME, '..\\etc').catch(() => false),
+        engine.delete(TABLE_NAME, '.etc').catch(() => false),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (result of results) {
+          expect(result).toBe(false);
+        }
+        done();
+      });
+    });
   });
 
   describe('"deleteAll"', () => {
@@ -222,6 +218,21 @@ describe('StoreEngine.FileEngine', () => {
         done();
       });
     });
+
+    it('does not allow path traversal', (done) => {
+      Promise.all([
+        engine.deleteAll('../etc').catch(() => false),
+        engine.deleteAll('..\\etc').catch(() => false),
+        engine.deleteAll('.etc').catch(() => false),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(3);
+        for (result of results) {
+          expect(result).toBe(false);
+        }
+        done();
+      });
+    });
   });
 
   describe('"read"', () => {
@@ -250,6 +261,26 @@ describe('StoreEngine.FileEngine', () => {
         done();
       })
       .catch((error) => done.fail(error));
+    });
+
+    it('does not allow path traversal', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      Promise.all([
+        engine.read('../etc', PRIMARY_KEY).catch(() => false),
+        engine.read('..\\etc', PRIMARY_KEY).catch(() => false),
+        engine.read('.etc', PRIMARY_KEY).catch(() => false),
+        engine.read(TABLE_NAME, '../etc').catch(() => false),
+        engine.read(TABLE_NAME, '..\\etc').catch(() => false),
+        engine.read(TABLE_NAME, '.etc').catch(() => false),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (result of results) {
+          expect(result).toBe(false);
+        }
+        done();
+      });
     });
   });
 
@@ -290,6 +321,21 @@ describe('StoreEngine.FileEngine', () => {
         expect(records[0].firstName).toBe(homer.entity.firstName);
         expect(records[1].firstName).toBe(lisa.entity.firstName);
         expect(records[2].firstName).toBe(marge.entity.firstName);
+        done();
+      });
+    });
+
+    it('does not allow path traversal', (done) => {
+      Promise.all([
+        engine.readAll('../etc').catch(() => false),
+        engine.readAll('..\\etc').catch(() => false),
+        engine.readAll('.etc').catch(() => false),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(3);
+        for (result of results) {
+          expect(result).toBe(false);
+        }
         done();
       });
     });
@@ -335,6 +381,21 @@ describe('StoreEngine.FileEngine', () => {
         done();
       });
     });
+
+    it('does not allow path traversal', (done) => {
+      Promise.all([
+        engine.readAllPrimaryKeys('../etc').catch(() => false),
+        engine.readAllPrimaryKeys('..\\etc').catch(() => false),
+        engine.readAllPrimaryKeys('.etc').catch(() => false),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(3);
+        for (result of results) {
+          expect(result).toBe(false);
+        }
+        done();
+      });
+    });
   });
 
   describe('"update"', () => {
@@ -365,6 +426,30 @@ describe('StoreEngine.FileEngine', () => {
           done();
         })
         .catch(done.fail);
+    });
+
+    it('does not allow path traversal', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      const updates = {
+        some: 'value'
+      };
+
+      Promise.all([
+        engine.update('../etc', PRIMARY_KEY, updates).catch(() => false),
+        engine.update('..\\etc', PRIMARY_KEY, updates).catch(() => false),
+        engine.update('.etc', PRIMARY_KEY, updates).catch(() => false),
+        engine.update(TABLE_NAME, '../etc', updates).catch(() => false),
+        engine.update(TABLE_NAME, '..\\etc', updates).catch(() => false),
+        engine.update(TABLE_NAME, '.etc', updates).catch(() => false),
+      ])
+      .then((results) => {
+        expect(results.length).toBe(6);
+        for (result of results) {
+          expect(result).toBe(false);
+        }
+        done();
+      });
     });
   });
 });

@@ -32,7 +32,7 @@ describe('StoreEngine.FileEngine', () => {
       .then((results) => {
         expect(results.length).toBe(6);
         for (error of results) {
-          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -93,7 +93,7 @@ describe('StoreEngine.FileEngine', () => {
       .then((results) => {
         expect(results.length).toBe(6);
         for (error of results) {
-          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -170,7 +170,7 @@ describe('StoreEngine.FileEngine', () => {
       .then((results) => {
         expect(results.length).toBe(6);
         for (error of results) {
-          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -228,7 +228,7 @@ describe('StoreEngine.FileEngine', () => {
       .then((results) => {
         expect(results.length).toBe(3);
         for (error of results) {
-          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -277,7 +277,7 @@ describe('StoreEngine.FileEngine', () => {
       .then((results) => {
         expect(results.length).toBe(6);
         for (error of results) {
-          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -334,7 +334,7 @@ describe('StoreEngine.FileEngine', () => {
       .then((results) => {
         expect(results.length).toBe(3);
         for (error of results) {
-          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -391,7 +391,7 @@ describe('StoreEngine.FileEngine', () => {
       .then((results) => {
         expect(results.length).toBe(3);
         for (error of results) {
-          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });
@@ -446,7 +446,7 @@ describe('StoreEngine.FileEngine', () => {
       .then((results) => {
         expect(results.length).toBe(6);
         for (error of results) {
-          expect(error.message).toBe('Path traversal has been detected. Aborting.');
+          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.PATH_TRAVERSAL);
         }
         done();
       });

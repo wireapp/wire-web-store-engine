@@ -3,30 +3,26 @@ import CRUDEngine from './CRUDEngine';
 import path = require('path');
 
 export default class FileEngine implements CRUDEngine {
-  constructor(public storeName: string, private options: {validatePath: boolean, fileExtension: string} = {
-      validatePath: true,
+  constructor(public storeName: string, private options: {fileExtension: string} = {
       fileExtension: '.dat'
     }) {
       this.storeName = path.normalize(storeName);
       this.options = options;
   }
 
-  private resolvePath(tableName: string, primaryKey?: string): Promise<string> {
-    const isPathTraversal = (pathName: string): boolean => {
-      return (pathName.includes('.') || pathName.includes('/') || pathName.includes('\\'));
+  resolvePath(tableName: string, primaryKey?: string): Promise<string> {
+    const isPathTraversal = (...testPaths: string[]): boolean => {
+      for (let testPath of testPaths) {
+        if (typeof testPath !== 'undefined' && (testPath.includes('.') || testPath.includes('/') || testPath.includes('\\'))) {
+          return true;
+        }
+      }
+      return false;
     };
 
     return new Promise((resolve, reject) => {
-      if (this.options.validatePath) {
-        if (isPathTraversal(tableName)) {
-          throw new Error('Path traversal has been detected in table name. Aborting.');
-        }
-
-        if (primaryKey) {
-          if (isPathTraversal(primaryKey)) {
-            throw new Error('Path traversal has been detected in primary key. Aborting.');
-          }
-        }
+      if (isPathTraversal(tableName, primaryKey)) {
+        throw new Error('Path traversal has been detected. Aborting.');
       }
 
       return resolve(path.join(this.storeName, tableName, (primaryKey ? `${primaryKey}${this.options.fileExtension}` : '')));

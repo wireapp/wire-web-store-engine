@@ -13,7 +13,7 @@ describe('StoreEngine.FileEngine', () => {
 
   afterEach((done) => fs.remove(TEST_DIRECTORY).then(done).catch(done.fail));
 
-  describe('"validatePaths"', () => {
+  describe('"resolvePath"', () => {
 
     it('properly validate paths', (done) => {
       const PRIMARY_KEY = 'primary-key';
@@ -22,12 +22,12 @@ describe('StoreEngine.FileEngine', () => {
       };
 
       Promise.all([
-        engine.create('../etc', PRIMARY_KEY, entity).catch(() => false),
-        engine.create('..\\etc', PRIMARY_KEY, entity).catch(() => false),
-        engine.create('.etc', PRIMARY_KEY, entity).catch(() => false),
-        engine.create(TABLE_NAME, '../etc', entity).catch(() => false),
-        engine.create(TABLE_NAME, '..\\etc', entity).catch(() => false),
-        engine.create(TABLE_NAME, '.etc', entity).catch(() => false),
+        engine.resolvePath('../etc', PRIMARY_KEY).catch(() => false),
+        engine.resolvePath('..\\etc', PRIMARY_KEY).catch(() => false),
+        engine.resolvePath('.etc', PRIMARY_KEY).catch(() => false),
+        engine.resolvePath(TABLE_NAME, '../etc').catch(() => false),
+        engine.resolvePath(TABLE_NAME, '..\\etc').catch(() => false),
+        engine.resolvePath(TABLE_NAME, '.etc').catch(() => false),
       ])
       .then((results) => {
         expect(results.length).toBe(6);

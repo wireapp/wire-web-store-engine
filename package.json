@@ -3,7 +3,7 @@
   "dependencies": {
     "@types/node": "8.0.16",
     "dexie": "1.5.1",
-    "fs-extra": "4.0.0"
+    "fs-extra": "4.0.1"
   },
   "devDependencies": {
     "jasmine": "2.6.0",

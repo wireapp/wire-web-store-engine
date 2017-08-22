@@ -45,7 +45,20 @@ describe('StoreEngine.LocalStorageEngine', () => {
         .catch(done.fail);
     });
 
-    it('overwrites an existing database record.', (done) => {
+    it('doesn\'t save empty values.', (done) => {
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = undefined;
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then(() => done.fail(new Error('Method is supposed to throw an error.')))
+        .catch((error) => {
+          expect(error).toEqual(jasmine.any(StoreEngine.error.RecordTypeError));
+          done();
+        });
+    });
+
+    it('throws an error when attempting to overwrite a record.', (done) => {
       const PRIMARY_KEY = 'primary-key';
 
       const firstEntity = {
@@ -58,9 +71,8 @@ describe('StoreEngine.LocalStorageEngine', () => {
 
       engine.create(TABLE_NAME, PRIMARY_KEY, firstEntity)
         .then(() => engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity))
-        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
-        .then((record) => {
-          expect(record.some).toBe(secondEntity.some);
+        .catch((error) => {
+          expect(error).toEqual(jasmine.any(StoreEngine.error.RecordAlreadyExistsError));
           done();
         });
     });

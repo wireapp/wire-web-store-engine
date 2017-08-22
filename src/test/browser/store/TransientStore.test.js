@@ -84,7 +84,7 @@ describe('store.TransientStore', () => {
     });
 
     it('returns a non-existent record as "undefined".', (done) => {
-      const primaryKey = 'not-found';
+      const primaryKey = 'not-existing';
 
       store.get(primaryKey)
         .then((bundle) => expect(bundle).toBeUndefined())

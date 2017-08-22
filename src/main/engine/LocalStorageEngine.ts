@@ -13,6 +13,12 @@ export default class LocalStorageEngine implements CRUDEngine {
         .then(() => {
           return this.read(tableName, primaryKey);
         })
+        .catch((error) => {
+          if (error.name === 'RecordNotFoundError') {
+            return undefined
+          }
+          throw error;
+        })
         .then((record: T) => {
           if (record) {
             const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
@@ -50,7 +56,12 @@ export default class LocalStorageEngine implements CRUDEngine {
   public read<T>(tableName: string, primaryKey: string): Promise<T> {
     return Promise.resolve().then(() => {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
-      return JSON.parse(window.localStorage.getItem(key)) || undefined;
+      const record = window.localStorage.getItem(key);
+      if (record) {
+        return JSON.parse(record);
+      }
+      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+      throw new RecordNotFoundError(message);
     });
   }
 

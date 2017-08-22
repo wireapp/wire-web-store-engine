@@ -6,6 +6,7 @@
     "fs-extra": "4.0.1"
   },
   "devDependencies": {
+    "cross-env": "5.0.5",
     "jasmine": "2.7.0",
     "karma": "1.7.0",
     "karma-chrome-launcher": "2.2.0",
@@ -31,7 +32,7 @@
     "preversion": "yarn && yarn dist && yarn test",
     "version": "yarn dist",
     "test": "yarn dist && yarn test:node && yarn test:browser",
-    "test:node": "jasmine",
+    "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
     "test:browser": "webpack && karma start karma.conf.js"
   },
   "types": "./dist/commonjs/index.d.ts",

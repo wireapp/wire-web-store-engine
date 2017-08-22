@@ -1,4 +1,4 @@
-import {Store, StoreEngine} from '../../../dist/commonjs';
+import {Store, StoreEngine} from '../../../../dist/commonjs/index';
 
 describe('store.TransientStore', () => {
   const DATABASE_NAME = 'database-name';

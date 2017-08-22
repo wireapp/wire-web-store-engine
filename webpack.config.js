@@ -7,7 +7,7 @@ module.exports = {
   },
   entry: {
     'demo-bundle': `${__dirname}/src/demo/index.js`,
-    'test-bundle': `${__dirname}/src/test/index.js`,
+    'test-bundle': `${__dirname}/src/test/browser/index.js`,
   },
   node: {
     path: 'empty',

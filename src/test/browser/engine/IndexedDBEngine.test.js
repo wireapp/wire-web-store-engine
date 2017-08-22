@@ -18,7 +18,7 @@
  */
 
 import Dexie from 'dexie';
-import {StoreEngine} from '../../../dist/commonjs';
+import {StoreEngine} from '../../../../dist/commonjs/index';
 
 describe('StoreEngine.IndexedDBEngine', () => {
   const DATABASE_NAME = 'database-name';

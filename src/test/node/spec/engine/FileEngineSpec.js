@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const {StoreEngine} = require('../../../dist/commonjs');
+const {StoreEngine} = require('../../../../../dist/commonjs/index');
 
 describe('StoreEngine.FileEngine', () => {
   const DATABASE_NAME = 'database-name';
@@ -17,9 +17,6 @@ describe('StoreEngine.FileEngine', () => {
 
     it('properly validate paths', (done) => {
       const PRIMARY_KEY = 'primary-key';
-      const entity = {
-        some: 'value'
-      };
 
       Promise.all([
         engine.resolvePath('../etc', PRIMARY_KEY).catch((error) => error),

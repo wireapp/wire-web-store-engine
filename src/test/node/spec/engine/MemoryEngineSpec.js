@@ -1,4 +1,4 @@
-const {StoreEngine} = require('../../../dist/commonjs');
+const {StoreEngine} = require('../../../../../dist/commonjs/index');
 
 describe('StoreEngine.MemoryEngine', () => {
   const DATABASE_NAME = 'database-name';

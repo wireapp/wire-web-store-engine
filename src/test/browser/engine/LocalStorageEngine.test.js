@@ -17,7 +17,7 @@
  *
  */
 
-import {StoreEngine} from '../../../dist/commonjs';
+import {StoreEngine} from '../../../../dist/commonjs/index';
 
 describe('StoreEngine.LocalStorageEngine', () => {
   const DATABASE_NAME = 'database-name';

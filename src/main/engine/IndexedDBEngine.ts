@@ -1,6 +1,6 @@
 import CRUDEngine from './CRUDEngine';
 import Dexie from 'dexie';
-import {RecordNotFoundError} from './error';
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class IndexedDBEngine implements CRUDEngine {
   public storeName: string;
@@ -10,14 +10,19 @@ export default class IndexedDBEngine implements CRUDEngine {
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
-    return this.db[tableName].add(entity, primaryKey)
-      .catch((error) => {
-        if (error.name === 'ConstraintError') {
-          return this.delete(tableName, primaryKey).then(() => this.create(tableName, primaryKey, entity));
-        } else {
-          throw error;
-        }
-      })
+    if (entity) {
+      return this.db[tableName].add(entity, primaryKey)
+        .catch((error) => {
+          if (error.name === 'ConstraintError') {
+            const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+            throw new RecordAlreadyExistsError(message);
+          } else {
+            throw error;
+          }
+        });
+    }
+    const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
+    throw new RecordTypeError(message);
   }
 
   public delete(tableName: string, primaryKey: string): Promise<string> {
@@ -37,7 +42,7 @@ export default class IndexedDBEngine implements CRUDEngine {
       if (record) {
         return record;
       }
-      const message: string = `Record "${primaryKey}" from store "${tableName}" could not be found.`;
+      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
       throw new RecordNotFoundError(message);
     });
   }

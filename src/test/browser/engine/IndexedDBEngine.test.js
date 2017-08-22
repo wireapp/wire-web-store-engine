@@ -58,7 +58,7 @@ describe('StoreEngine.IndexedDBEngine', () => {
         .catch(done.fail);
     });
 
-    it('overwrites an existing database record.', (done) => {
+    it('throws an error when attempting to overwrite a record.', (done) => {
       const PRIMARY_KEY = 'primary-key';
 
       const firstEntity = {
@@ -71,9 +71,8 @@ describe('StoreEngine.IndexedDBEngine', () => {
 
       engine.create(TABLE_NAME, PRIMARY_KEY, firstEntity)
         .then(() => engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity))
-        .then((primaryKey) => engine.read(TABLE_NAME, primaryKey))
-        .then((record) => {
-          expect(record.some).toBe(secondEntity.some);
+        .catch((error) => {
+          expect(error).toEqual(jasmine.any(StoreEngine.error.RecordAlreadyExistsError));
           done();
         });
     });
@@ -194,7 +193,7 @@ describe('StoreEngine.IndexedDBEngine', () => {
           });
       });
 
-      it('returns "undefined" if a record cannot be found.', (done) => {
+      it('throws an error if a record cannot be found.', (done) => {
         const PRIMARY_KEY = 'primary-key';
 
         engine.read(TABLE_NAME, PRIMARY_KEY)

@@ -22,7 +22,7 @@ export default class IndexedDBEngine implements CRUDEngine {
         });
     }
     const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
-    throw new RecordTypeError(message);
+    return Promise.reject(new RecordTypeError(message));
   }
 
   public delete(tableName: string, primaryKey: string): Promise<string> {

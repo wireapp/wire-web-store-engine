@@ -253,15 +253,15 @@ describe('StoreEngine.FileEngine', () => {
         .catch((error) => done.fail(error)));
     });
 
-    it('returns "undefined" if a record cannot be found.', (done) => {
+    it('throws an error if a record cannot be found.', (done) => {
       const PRIMARY_KEY = 'primary-key';
 
       engine.read(TABLE_NAME, PRIMARY_KEY)
-      .then((record) => {
-        expect(record).toBeUndefined();
-        done();
-      })
-      .catch((error) => done.fail(error));
+        .then(() => done.fail(new Error('Method is supposed to throw an error.')))
+        .catch((error) => {
+          expect(error).toEqual(jasmine.any(StoreEngine.error.RecordNotFoundError));
+          done();
+        });
     });
 
     it('does not allow path traversal', (done) => {

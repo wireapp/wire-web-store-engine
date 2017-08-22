@@ -198,11 +198,11 @@ describe('StoreEngine.IndexedDBEngine', () => {
         const PRIMARY_KEY = 'primary-key';
 
         engine.read(TABLE_NAME, PRIMARY_KEY)
-          .then((record) => {
-            expect(record).toBeUndefined();
+          .then(() => done.fail(new Error('Method is supposed to throw an error.')))
+          .catch((error) => {
+            expect(error).toEqual(jasmine.any(StoreEngine.error.RecordNotFoundError));
             done();
-          })
-          .catch((error) => done.fail(error));
+          });
       });
     });
 

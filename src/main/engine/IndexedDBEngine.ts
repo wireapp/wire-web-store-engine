@@ -1,5 +1,6 @@
 import CRUDEngine from './CRUDEngine';
 import Dexie from 'dexie';
+import {RecordNotFoundError} from './error';
 
 export default class IndexedDBEngine implements CRUDEngine {
   public storeName: string;
@@ -30,7 +31,15 @@ export default class IndexedDBEngine implements CRUDEngine {
   }
 
   public read<T>(tableName: string, primaryKey: string): Promise<T> {
-    return this.db[tableName].get(primaryKey);
+    return Promise.resolve().then(() => {
+      return this.db[tableName].get(primaryKey);
+    }).then((record: T) => {
+      if (record) {
+        return record;
+      }
+      const message: string = `Record "${primaryKey}" from store "${tableName}" could not be found.`;
+      throw new RecordNotFoundError(message);
+    });
   }
 
   public readAll<T>(tableName: string): Promise<T[]> {

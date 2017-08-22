@@ -1,8 +1,8 @@
 import ExpiredBundle from './ExpiredBundle';
-import RecordAlreadyExistsError from './RecordAlreadyExistsError';
 import TransientBundle from './TransientBundle';
 import {CRUDEngine} from '../engine';
 import {EventEmitter} from 'events';
+import {RecordAlreadyExistsError} from '../engine/error';
 
 export default class TransientStore extends EventEmitter {
   private bundles: { [index: string]: TransientBundle } = {};

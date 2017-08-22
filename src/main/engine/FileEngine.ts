@@ -1,14 +1,14 @@
 import * as fs from 'fs-extra';
 import CRUDEngine from './CRUDEngine';
 import path = require('path');
-import {PathValidationError, RecordNotFoundError} from './error';
+import {PathValidationError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class FileEngine implements CRUDEngine {
-  constructor(public storeName: string, private options: {fileExtension: string} = {
-      fileExtension: '.dat'
-    }) {
-      this.storeName = path.normalize(storeName);
-      this.options = options;
+  constructor(public storeName: string, private options: { fileExtension: string } = {
+    fileExtension: '.dat'
+  }) {
+    this.storeName = path.normalize(storeName);
+    this.options = options;
   }
 
   private resolvePath(tableName: string, primaryKey?: string): Promise<string> {
@@ -31,17 +31,21 @@ export default class FileEngine implements CRUDEngine {
   }
 
   create<T>(tableName: string, primaryKey: string, entity: any): Promise<string> {
-    return this.resolvePath(tableName, primaryKey).then(file => {
-      // TODO: Implement "base64" serialization to save any kind of data.
-      if (typeof entity === 'object') {
-        try {
-          entity = JSON.stringify(entity);
-        } catch (error) {
-          entity = entity.toString();
+    if (entity) {
+      return this.resolvePath(tableName, primaryKey).then(file => {
+        // TODO: Implement "base64" serialization to save any kind of data.
+        if (typeof entity === 'object') {
+          try {
+            entity = JSON.stringify(entity);
+          } catch (error) {
+            entity = entity.toString();
+          }
         }
-      }
-      return fs.outputFile(file, entity).then(() => primaryKey);
-    });
+        return fs.outputFile(file, entity).then(() => primaryKey);
+      });
+    }
+    const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
+    return Promise.reject(new RecordTypeError(message));
   }
 
   delete(tableName: string, primaryKey: string): Promise<string> {
@@ -70,7 +74,8 @@ export default class FileEngine implements CRUDEngine {
           } else {
             try {
               data = JSON.parse(data);
-            } catch (error) {}
+            } catch (error) {
+            }
             resolve(data);
           }
         });

@@ -14,7 +14,7 @@ export default class LocalStorageEngine implements CRUDEngine {
           return this.read(tableName, primaryKey);
         })
         .catch((error) => {
-          if (error.name === 'RecordNotFoundError') {
+          if (error instanceof RecordNotFoundError) {
             return undefined
           }
           throw error;
@@ -98,7 +98,7 @@ export default class LocalStorageEngine implements CRUDEngine {
     }).then((updatedEntity: Object) => {
       return this.create(tableName, primaryKey, updatedEntity)
         .catch((error) => {
-          if (error.name === 'RecordAlreadyExistsError') {
+          if (error instanceof RecordAlreadyExistsError) {
             return this.delete(tableName, primaryKey).then(() => this.create(tableName, primaryKey, updatedEntity));
           } else {
             throw error;

@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import CRUDEngine from './CRUDEngine';
 import path = require('path');
-import {PathValidationError, RecordNotFoundError, RecordTypeError} from './error';
+import {PathValidationError, RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class FileEngine implements CRUDEngine {
   constructor(public storeName: string, private options: { fileExtension: string } = {
@@ -31,21 +31,41 @@ export default class FileEngine implements CRUDEngine {
   }
 
   create<T>(tableName: string, primaryKey: string, entity: any): Promise<string> {
-    if (entity) {
-      return this.resolvePath(tableName, primaryKey).then(file => {
-        // TODO: Implement "base64" serialization to save any kind of data.
-        if (typeof entity === 'object') {
-          try {
-            entity = JSON.stringify(entity);
-          } catch (error) {
-            entity = entity.toString();
-          }
-        }
-        return fs.outputFile(file, entity).then(() => primaryKey);
-      });
-    }
-    const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
-    return Promise.reject(new RecordTypeError(message));
+    return new Promise((resolve, reject) => {
+      if (entity) {
+        this.resolvePath(tableName, primaryKey)
+          .then(file => {
+            // TODO: Implement "base64" serialization to save any kind of data.
+            if (typeof entity === 'object') {
+              try {
+                entity = JSON.stringify(entity);
+              } catch (error) {
+                entity = entity.toString();
+              }
+            }
+
+            fs.writeFile(file, entity, {flag: 'wx'}, (error) => {
+              if (error) {
+                if (error.code === 'ENOENT') {
+                  fs.outputFile(file, entity)
+                    .then(() => resolve(primaryKey))
+                    .catch((error) => reject(error));
+                } else if (error.code === 'EEXIST') {
+                  const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+                  reject(new RecordAlreadyExistsError(message));
+                } else {
+                  reject(error);
+                }
+              } else {
+                resolve(primaryKey);
+              }
+            });
+          });
+      } else {
+        const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
+        reject(new RecordTypeError(message));
+      }
+    });
   }
 
   delete(tableName: string, primaryKey: string): Promise<string> {
@@ -120,16 +140,17 @@ export default class FileEngine implements CRUDEngine {
 
   // TODO: Make this function also work for binary data.
   update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
-    return this.resolvePath(tableName, primaryKey).then(file => {
-      return this.read(tableName, primaryKey)
-        .then((record: any) => {
-          if (typeof record === 'string') {
-            record = JSON.parse(record);
-          }
-          const updatedRecord: Object = {...record, ...changes};
-          return JSON.stringify(updatedRecord);
-        })
-        .then((updatedRecord: any) => this.create(tableName, primaryKey, updatedRecord));
-    });
+    return this.resolvePath(tableName, primaryKey)
+      .then(file => {
+        return this.read(tableName, primaryKey)
+          .then((record: any) => {
+            if (typeof record === 'string') {
+              record = JSON.parse(record);
+            }
+            const updatedRecord: Object = {...record, ...changes};
+            return JSON.stringify(updatedRecord);
+          })
+          .then((updatedRecord: any) => this.create(tableName, primaryKey, updatedRecord));
+      });
   }
 }

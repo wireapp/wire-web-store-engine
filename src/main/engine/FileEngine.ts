@@ -60,7 +60,7 @@ export default class FileEngine implements CRUDEngine {
                 resolve(primaryKey);
               }
             });
-          });
+          }).catch(reject);
       } else {
         const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
         reject(new RecordTypeError(message));
@@ -150,7 +150,8 @@ export default class FileEngine implements CRUDEngine {
             const updatedRecord: Object = {...record, ...changes};
             return JSON.stringify(updatedRecord);
           })
-          .then((updatedRecord: any) => this.create(tableName, primaryKey, updatedRecord));
+          .then((updatedRecord: any) => fs.outputFile(file, updatedRecord))
+          .then(() => primaryKey);
       });
   }
 }

@@ -171,7 +171,7 @@ describe('StoreEngine.MemoryEngine', () => {
             expect(record.some).toBe(entity.some);
             done();
           })
-          .catch((error) => done.fail(error)));
+          .catch(error => done.fail(error)));
     });
 
     it('throws an error if a record cannot be found.', (done) => {

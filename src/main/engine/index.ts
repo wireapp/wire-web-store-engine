@@ -4,10 +4,4 @@ import IndexedDBEngine from './IndexedDBEngine';
 import MemoryEngine from './MemoryEngine';
 import LocalStorageEngine from './LocalStorageEngine';
 
-export {
-  CRUDEngine,
-  FileEngine,
-  IndexedDBEngine,
-  MemoryEngine,
-  LocalStorageEngine,
-};
+export {CRUDEngine, FileEngine, IndexedDBEngine, MemoryEngine, LocalStorageEngine};

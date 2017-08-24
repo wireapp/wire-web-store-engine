@@ -14,11 +14,11 @@ export = {
       PathValidationError,
       RecordAlreadyExistsError,
       RecordNotFoundError,
-      RecordTypeError
+      RecordTypeError,
     },
     FileEngine,
     IndexedDBEngine,
     MemoryEngine,
     LocalStorageEngine,
-  }
+  },
 };

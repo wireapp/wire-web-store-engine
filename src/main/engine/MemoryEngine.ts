@@ -2,7 +2,7 @@ import CRUDEngine from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class MemoryEngine implements CRUDEngine {
-  private stores: { [index: string]: { [index: string]: any } } = {};
+  private stores: {[index: string]: {[index: string]: any}} = {};
 
   constructor(public storeName: string) {
     this.stores[storeName] = {};

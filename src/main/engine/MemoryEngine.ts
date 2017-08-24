@@ -1,4 +1,5 @@
 import CRUDEngine from './CRUDEngine';
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class MemoryEngine implements CRUDEngine {
   private stores: { [index: string]: { [index: string]: any } } = {};
@@ -14,11 +15,23 @@ export default class MemoryEngine implements CRUDEngine {
   }
 
   public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
-    this.prepareTable(tableName);
-    return Promise.resolve().then(() => {
+    if (entity) {
+      this.prepareTable(tableName);
+
+      const record = this.stores[this.storeName][tableName][primaryKey];
+
+      if (record) {
+        const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
+        const error = new RecordAlreadyExistsError(message);
+        return Promise.reject(error);
+      }
+
       this.stores[this.storeName][tableName][primaryKey] = entity;
-      return primaryKey;
-    });
+      return Promise.resolve(primaryKey);
+    }
+
+    const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
+    return Promise.reject(new RecordTypeError(message));
   }
 
   public delete(tableName: string, primaryKey: string): Promise<string> {
@@ -38,9 +51,14 @@ export default class MemoryEngine implements CRUDEngine {
 
   public read<T>(tableName: string, primaryKey: string): Promise<T> {
     this.prepareTable(tableName);
-    return Promise.resolve().then(() => {
-      return this.stores[this.storeName][tableName][primaryKey];
-    });
+    const record = this.stores[this.storeName][tableName][primaryKey];
+
+    if (record) {
+      return Promise.resolve(record);
+    } else {
+      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+      return Promise.reject(new RecordNotFoundError(message));
+    }
   }
 
   public readAll<T>(tableName: string): Promise<T[]> {
@@ -61,10 +79,13 @@ export default class MemoryEngine implements CRUDEngine {
 
   public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     this.prepareTable(tableName);
-    return this.read(tableName, primaryKey).then((entity: Object) => {
-      return Object.assign(entity, changes);
-    }).then((updatedEntity: Object) => {
-      return this.create(tableName, primaryKey, updatedEntity);
-    });
+    return this.read(tableName, primaryKey)
+      .then((entity: Object) => {
+        return Object.assign(entity, changes);
+      })
+      .then((updatedEntity: Object) => {
+        this.stores[this.storeName][tableName][primaryKey] = updatedEntity;
+        return primaryKey;
+      });
   }
 }

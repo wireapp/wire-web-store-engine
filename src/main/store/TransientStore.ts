@@ -1,8 +1,8 @@
 import ExpiredBundle from './ExpiredBundle';
-import RecordAlreadyExistsError from './RecordAlreadyExistsError';
 import TransientBundle from './TransientBundle';
 import {CRUDEngine} from '../engine';
 import {EventEmitter} from 'events';
+import {RecordAlreadyExistsError, RecordNotFoundError} from '../engine/error';
 
 export default class TransientStore extends EventEmitter {
   private bundles: { [index: string]: TransientBundle } = {};
@@ -72,6 +72,12 @@ export default class TransientStore extends EventEmitter {
     return this.getFromCache(primaryKey)
       .then((cachedBundle: TransientBundle) => {
         return (cachedBundle !== undefined) ? cachedBundle : this.getFromStore(primaryKey);
+      })
+      .catch(error => {
+        if (error instanceof RecordNotFoundError) {
+          return undefined;
+        }
+        throw error;
       });
   }
 

@@ -1,7 +1,7 @@
-export default class RecordAlreadyExistsError extends Error {
+export default class RecordNotFoundError extends Error {
   constructor(public message: string) {
     super(message);
-    Object.setPrototypeOf(this, RecordAlreadyExistsError.prototype);
+    Object.setPrototypeOf(this, RecordNotFoundError.prototype);
 
     this.message = message;
     this.name = (<any>this).constructor.name;

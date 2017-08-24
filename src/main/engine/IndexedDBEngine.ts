@@ -1,10 +1,6 @@
 import CRUDEngine from './CRUDEngine';
 import Dexie from 'dexie';
-import {
-  RecordAlreadyExistsError,
-  RecordNotFoundError,
-  RecordTypeError,
-} from './error';
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class IndexedDBEngine implements CRUDEngine {
   public storeName: string;
@@ -13,11 +9,7 @@ export default class IndexedDBEngine implements CRUDEngine {
     this.storeName = db.name;
   }
 
-  public create<T>(
-    tableName: string,
-    primaryKey: string,
-    entity: T
-  ): Promise<string> {
+  public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (entity) {
       return this.db[tableName].add(entity, primaryKey).catch(error => {
         if (error instanceof Dexie.ConstraintError) {
@@ -33,9 +25,7 @@ export default class IndexedDBEngine implements CRUDEngine {
   }
 
   public delete(tableName: string, primaryKey: string): Promise<string> {
-    return Promise.resolve()
-      .then(() => this.db[tableName].delete(primaryKey))
-      .then(() => primaryKey);
+    return Promise.resolve().then(() => this.db[tableName].delete(primaryKey)).then(() => primaryKey);
   }
 
   public deleteAll(tableName: string): Promise<boolean> {
@@ -64,13 +54,7 @@ export default class IndexedDBEngine implements CRUDEngine {
     return this.db[tableName].toCollection().keys();
   }
 
-  public update(
-    tableName: string,
-    primaryKey: string,
-    changes: Object
-  ): Promise<string> {
-    return this.db[tableName]
-      .update(primaryKey, changes)
-      .then((updatedRecords: number) => primaryKey);
+  public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
+    return this.db[tableName].update(primaryKey, changes).then((updatedRecords: number) => primaryKey);
   }
 }

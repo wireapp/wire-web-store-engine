@@ -7,12 +7,15 @@
   },
   "devDependencies": {
     "cross-env": "5.0.5",
+    "husky": "0.14.3",
     "jasmine": "2.7.0",
     "karma": "1.7.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "1.1.0",
     "karma-jasmine-diff-reporter": "1.1.0",
     "karma-sourcemap-loader": "0.3.7",
+    "lint-staged": "4.0.4",
+    "prettier": "1.5.3",
     "rimraf": "2.6.1",
     "typescript": "2.4.2",
     "webpack": "3.5.5"
@@ -28,13 +31,20 @@
   "scripts": {
     "clear": "rimraf dist",
     "dist": "yarn clear && tsc",
-    "lint": "prettier --single-quote --trailing-comma es5 --write src/{,/**/}*.ts",
+    "lint": "prettier --single-quote --trailing-comma all --no-bracket-spacing --print-width 120 --write \"src/**/*.ts\"",
     "postversion": "git push && git push --tags",
+    "precommit": "lint-staged",
     "preversion": "yarn && yarn dist && yarn test",
     "version": "yarn dist",
     "test": "yarn lint && yarn dist && yarn test:node && yarn test:browser",
     "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
     "test:browser": "webpack && karma start karma.conf.js"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "yarn lint",
+      "git add"
+    ]
   },
   "types": "./dist/commonjs/index.d.ts",
   "version": "0.1.0"

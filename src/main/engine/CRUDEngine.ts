@@ -7,11 +7,7 @@ interface CRUDEngine {
   read<T>(tableName: string, primaryKey: string): Promise<T>;
   readAll<T>(tableName: string): Promise<T[]>;
   readAllPrimaryKeys(tableName: string): Promise<string[]>;
-  update(
-    tableName: string,
-    primaryKey: string,
-    changes: Object
-  ): Promise<string>;
+  update(tableName: string, primaryKey: string, changes: Object): Promise<string>;
   // TODO: Implement "updateAll"
 }
 

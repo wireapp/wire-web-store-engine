@@ -1,12 +1,8 @@
 import CRUDEngine from './CRUDEngine';
-import {
-  RecordAlreadyExistsError,
-  RecordNotFoundError,
-  RecordTypeError,
-} from './error';
+import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
 export default class MemoryEngine implements CRUDEngine {
-  private stores: { [index: string]: { [index: string]: any } } = {};
+  private stores: {[index: string]: {[index: string]: any}} = {};
 
   constructor(public storeName: string) {
     this.stores[storeName] = {};
@@ -18,11 +14,7 @@ export default class MemoryEngine implements CRUDEngine {
     }
   }
 
-  public create<T>(
-    tableName: string,
-    primaryKey: string,
-    entity: T
-  ): Promise<string> {
+  public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
     if (entity) {
       this.prepareTable(tableName);
 
@@ -73,9 +65,7 @@ export default class MemoryEngine implements CRUDEngine {
     this.prepareTable(tableName);
     const promises: Array<Promise<T>> = [];
 
-    for (let primaryKey of Object.keys(
-      this.stores[this.storeName][tableName]
-    )) {
+    for (let primaryKey of Object.keys(this.stores[this.storeName][tableName])) {
       promises.push(this.read(tableName, primaryKey));
     }
 
@@ -87,11 +77,7 @@ export default class MemoryEngine implements CRUDEngine {
     return Promise.resolve(Object.keys(this.stores[this.storeName][tableName]));
   }
 
-  public update(
-    tableName: string,
-    primaryKey: string,
-    changes: Object
-  ): Promise<string> {
+  public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
     this.prepareTable(tableName);
     return this.read(tableName, primaryKey)
       .then((entity: Object) => {

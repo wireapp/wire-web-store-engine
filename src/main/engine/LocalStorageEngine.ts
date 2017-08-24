@@ -96,7 +96,7 @@ export default class LocalStorageEngine implements CRUDEngine {
       return Object.assign(entity, changes);
     }).then((updatedEntity: Object) => {
       return this.create(tableName, primaryKey, updatedEntity)
-        .catch((error) => {
+        .catch(error => {
           if (error instanceof RecordAlreadyExistsError) {
             return this.delete(tableName, primaryKey).then(() => this.create(tableName, primaryKey, updatedEntity));
           } else {

@@ -44,12 +44,12 @@ export default class FileEngine implements CRUDEngine {
               }
             }
 
-            fs.writeFile(file, entity, {flag: 'wx'}, (error) => {
+            fs.writeFile(file, entity, {flag: 'wx'}, error => {
               if (error) {
                 if (error.code === 'ENOENT') {
                   fs.outputFile(file, entity)
                     .then(() => resolve(primaryKey))
-                    .catch((error) => reject(error));
+                    .catch(error => reject(error));
                 } else if (error.code === 'EEXIST') {
                   const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
                   reject(new RecordAlreadyExistsError(message));
@@ -60,7 +60,8 @@ export default class FileEngine implements CRUDEngine {
                 resolve(primaryKey);
               }
             });
-          }).catch(reject);
+          })
+          .catch(reject);
       } else {
         const message: string = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;
         reject(new RecordTypeError(message));
@@ -95,6 +96,7 @@ export default class FileEngine implements CRUDEngine {
             try {
               data = JSON.parse(data);
             } catch (error) {
+              // No JSON found but that's okay
             }
             resolve(data);
           }

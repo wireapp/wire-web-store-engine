@@ -73,12 +73,12 @@ export default class TransientStore extends EventEmitter {
       .then((cachedBundle: TransientBundle) => {
         return (cachedBundle !== undefined) ? cachedBundle : this.getFromStore(primaryKey);
       })
-      .catch((error) => {
+      .catch(error => {
         if (error instanceof RecordNotFoundError) {
           return undefined;
         }
         throw error;
-      })
+      });
   }
 
   private getFromCache(primaryKey: string): Promise<TransientBundle> {

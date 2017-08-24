@@ -31,7 +31,7 @@ describe('StoreEngine.MemoryEngine', () => {
 
       engine.create(TABLE_NAME, PRIMARY_KEY, entity)
         .then(() => done.fail(new Error('Method is supposed to throw an error.')))
-        .catch((error) => {
+        .catch(error => {
           expect(error).toEqual(jasmine.any(StoreEngine.error.RecordTypeError));
           done();
         });
@@ -179,7 +179,7 @@ describe('StoreEngine.MemoryEngine', () => {
 
       engine.read(TABLE_NAME, PRIMARY_KEY)
         .then(() => done.fail(new Error('Method is supposed to throw an error.')))
-        .catch((error) => {
+        .catch(error => {
           expect(error).toEqual(jasmine.any(StoreEngine.error.RecordNotFoundError));
           done();
         });

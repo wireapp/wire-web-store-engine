@@ -10,12 +10,10 @@ export default class LocalStorageEngine implements CRUDEngine {
     if (entity) {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       return Promise.resolve()
-        .then(() => {
-          return this.read(tableName, primaryKey);
-        })
+        .then(() => this.read(tableName, primaryKey))
         .catch((error) => {
           if (error instanceof RecordNotFoundError) {
-            return undefined
+            return undefined;
           }
           throw error;
         })
@@ -54,15 +52,16 @@ export default class LocalStorageEngine implements CRUDEngine {
   }
 
   public read<T>(tableName: string, primaryKey: string): Promise<T> {
-    return Promise.resolve().then(() => {
-      const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
-      const record = window.localStorage.getItem(key);
-      if (record) {
-        return JSON.parse(record);
-      }
-      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-      throw new RecordNotFoundError(message);
-    });
+    return Promise.resolve()
+      .then(() => {
+        const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
+        const record = window.localStorage.getItem(key);
+        if (record) {
+          return JSON.parse(record);
+        }
+        const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+        throw new RecordNotFoundError(message);
+      });
   }
 
   public readAll<T>(tableName: string): Promise<T[]> {

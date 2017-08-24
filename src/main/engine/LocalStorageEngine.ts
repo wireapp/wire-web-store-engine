@@ -11,7 +11,7 @@ export default class LocalStorageEngine implements CRUDEngine {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       return Promise.resolve()
         .then(() => this.read(tableName, primaryKey))
-        .catch((error) => {
+        .catch(error => {
           if (error instanceof RecordNotFoundError) {
             return undefined;
           }

@@ -50,7 +50,7 @@ describe('StoreEngine.MemoryEngine', () => {
 
       engine.create(TABLE_NAME, PRIMARY_KEY, firstEntity)
         .then(() => engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity))
-        .catch((error) => {
+        .catch(error => {
           expect(error).toEqual(jasmine.any(StoreEngine.error.RecordAlreadyExistsError));
           done();
         });

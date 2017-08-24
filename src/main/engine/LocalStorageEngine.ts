@@ -1,12 +1,18 @@
 import CRUDEngine from './CRUDEngine';
-import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
+import {
+  RecordAlreadyExistsError,
+  RecordNotFoundError,
+  RecordTypeError,
+} from './error';
 
 export default class LocalStorageEngine implements CRUDEngine {
+  constructor(public storeName: string) {}
 
-  constructor(public storeName: string) {
-  }
-
-  public create<T>(tableName: string, primaryKey: string, entity: T): Promise<string> {
+  public create<T>(
+    tableName: string,
+    primaryKey: string,
+    entity: T
+  ): Promise<string> {
     if (entity) {
       const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
       return Promise.resolve()
@@ -44,7 +50,7 @@ export default class LocalStorageEngine implements CRUDEngine {
       Object.keys(localStorage).forEach((key: string) => {
         const prefix: string = `${this.storeName}@${tableName}@`;
         if (key.startsWith(prefix)) {
-          localStorage.removeItem(key)
+          localStorage.removeItem(key);
         }
       });
       return true;
@@ -52,16 +58,15 @@ export default class LocalStorageEngine implements CRUDEngine {
   }
 
   public read<T>(tableName: string, primaryKey: string): Promise<T> {
-    return Promise.resolve()
-      .then(() => {
-        const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
-        const record = window.localStorage.getItem(key);
-        if (record) {
-          return JSON.parse(record);
-        }
-        const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-        throw new RecordNotFoundError(message);
-      });
+    return Promise.resolve().then(() => {
+      const key: string = `${this.storeName}@${tableName}@${primaryKey}`;
+      const record = window.localStorage.getItem(key);
+      if (record) {
+        return JSON.parse(record);
+      }
+      const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+      throw new RecordNotFoundError(message);
+    });
   }
 
   public readAll<T>(tableName: string): Promise<T[]> {
@@ -91,18 +96,29 @@ export default class LocalStorageEngine implements CRUDEngine {
     return Promise.resolve(primaryKeys);
   }
 
-  public update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
-    return this.read(tableName, primaryKey).then((entity: Object) => {
-      return Object.assign(entity, changes);
-    }).then((updatedEntity: Object) => {
-      return this.create(tableName, primaryKey, updatedEntity)
-        .catch(error => {
+  public update(
+    tableName: string,
+    primaryKey: string,
+    changes: Object
+  ): Promise<string> {
+    return this.read(tableName, primaryKey)
+      .then((entity: Object) => {
+        return Object.assign(entity, changes);
+      })
+      .then((updatedEntity: Object) => {
+        return this.create(
+          tableName,
+          primaryKey,
+          updatedEntity
+        ).catch(error => {
           if (error instanceof RecordAlreadyExistsError) {
-            return this.delete(tableName, primaryKey).then(() => this.create(tableName, primaryKey, updatedEntity));
+            return this.delete(tableName, primaryKey).then(() =>
+              this.create(tableName, primaryKey, updatedEntity)
+            );
           } else {
             throw error;
           }
-        })
-    });
+        });
+      });
   }
 }

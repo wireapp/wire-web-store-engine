@@ -28,10 +28,11 @@
   "scripts": {
     "clear": "rimraf dist",
     "dist": "yarn clear && tsc",
+    "lint": "prettier --single-quote --trailing-comma es5 --write src/{,/**/}*.ts",
     "postversion": "git push && git push --tags",
     "preversion": "yarn && yarn dist && yarn test",
     "version": "yarn dist",
-    "test": "yarn dist && yarn test:node && yarn test:browser",
+    "test": "yarn lint && yarn dist && yarn test:node && yarn test:browser",
     "test:node": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json jasmine",
     "test:browser": "webpack && karma start karma.conf.js"
   },

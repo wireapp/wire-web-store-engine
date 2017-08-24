@@ -1,12 +1,20 @@
 import * as fs from 'fs-extra';
 import CRUDEngine from './CRUDEngine';
 import path = require('path');
-import {PathValidationError, RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
+import {
+  PathValidationError,
+  RecordAlreadyExistsError,
+  RecordNotFoundError,
+  RecordTypeError,
+} from './error';
 
 export default class FileEngine implements CRUDEngine {
-  constructor(public storeName: string, private options: { fileExtension: string } = {
-    fileExtension: '.dat'
-  }) {
+  constructor(
+    public storeName: string,
+    private options: { fileExtension: string } = {
+      fileExtension: '.dat',
+    }
+  ) {
     this.storeName = path.normalize(storeName);
     this.options = options;
   }
@@ -14,7 +22,12 @@ export default class FileEngine implements CRUDEngine {
   private resolvePath(tableName: string, primaryKey?: string): Promise<string> {
     const isPathTraversal = (...testPaths: string[]): boolean => {
       for (let testPath of testPaths) {
-        if (typeof testPath !== 'undefined' && (testPath.includes('.') || testPath.includes('/') || testPath.includes('\\'))) {
+        if (
+          typeof testPath !== 'undefined' &&
+          (testPath.includes('.') ||
+            testPath.includes('/') ||
+            testPath.includes('\\'))
+        ) {
           return true;
         }
       }
@@ -23,14 +36,26 @@ export default class FileEngine implements CRUDEngine {
 
     return new Promise((resolve, reject) => {
       if (isPathTraversal(tableName, primaryKey)) {
-        return reject(new PathValidationError(PathValidationError.TYPE.PATH_TRAVERSAL));
+        return reject(
+          new PathValidationError(PathValidationError.TYPE.PATH_TRAVERSAL)
+        );
       }
 
-      return resolve(path.join(this.storeName, tableName, (primaryKey ? `${primaryKey}${this.options.fileExtension}` : '')));
+      return resolve(
+        path.join(
+          this.storeName,
+          tableName,
+          primaryKey ? `${primaryKey}${this.options.fileExtension}` : ''
+        )
+      );
     });
   }
 
-  create<T>(tableName: string, primaryKey: string, entity: any): Promise<string> {
+  create<T>(
+    tableName: string,
+    primaryKey: string,
+    entity: any
+  ): Promise<string> {
     return new Promise((resolve, reject) => {
       if (entity) {
         this.resolvePath(tableName, primaryKey)
@@ -44,10 +69,11 @@ export default class FileEngine implements CRUDEngine {
               }
             }
 
-            fs.writeFile(file, entity, {flag: 'wx'}, error => {
+            fs.writeFile(file, entity, { flag: 'wx' }, error => {
               if (error) {
                 if (error.code === 'ENOENT') {
-                  fs.outputFile(file, entity)
+                  fs
+                    .outputFile(file, entity)
                     .then(() => resolve(primaryKey))
                     .catch(error => reject(error));
                 } else if (error.code === 'EEXIST') {
@@ -72,7 +98,7 @@ export default class FileEngine implements CRUDEngine {
   delete(tableName: string, primaryKey: string): Promise<string> {
     return this.resolvePath(tableName, primaryKey).then(file => {
       return fs.remove(file).then(() => primaryKey).catch(() => false);
-    })
+    });
   }
 
   deleteAll(tableName: string): Promise<boolean> {
@@ -84,23 +110,27 @@ export default class FileEngine implements CRUDEngine {
   read<T>(tableName: string, primaryKey: string): Promise<T> {
     return this.resolvePath(tableName, primaryKey).then(file => {
       return new Promise<T>((resolve, reject) => {
-        fs.readFile(file, {encoding: 'utf8', flag: 'r'}, (error: any, data: any) => {
-          if (error) {
-            if (error.code === 'ENOENT') {
-              const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
-              reject(new RecordNotFoundError(message));
+        fs.readFile(
+          file,
+          { encoding: 'utf8', flag: 'r' },
+          (error: any, data: any) => {
+            if (error) {
+              if (error.code === 'ENOENT') {
+                const message: string = `Record "${primaryKey}" in "${tableName}" could not be found.`;
+                reject(new RecordNotFoundError(message));
+              } else {
+                reject(error);
+              }
             } else {
-              reject(error);
+              try {
+                data = JSON.parse(data);
+              } catch (error) {
+                // No JSON found but that's okay
+              }
+              resolve(data);
             }
-          } else {
-            try {
-              data = JSON.parse(data);
-            } catch (error) {
-              // No JSON found but that's okay
-            }
-            resolve(data);
           }
-        });
+        );
       });
     });
   }
@@ -112,8 +142,12 @@ export default class FileEngine implements CRUDEngine {
           if (error) {
             reject(error);
           } else {
-            const recordNames = files.map((file) => path.basename(file, path.extname(file)));
-            const promises = recordNames.map((primaryKey) => this.read(tableName, primaryKey));
+            const recordNames = files.map(file =>
+              path.basename(file, path.extname(file))
+            );
+            const promises = recordNames.map(primaryKey =>
+              this.read(tableName, primaryKey)
+            );
             Promise.all(promises).then((records: T[]) => resolve(records));
           }
         });
@@ -132,7 +166,9 @@ export default class FileEngine implements CRUDEngine {
               throw new Error(error);
             }
           } else {
-            const fileNames: string[] = files.map((file: string) => path.parse(file).name);
+            const fileNames: string[] = files.map(
+              (file: string) => path.parse(file).name
+            );
             resolve(fileNames);
           }
         });
@@ -141,19 +177,22 @@ export default class FileEngine implements CRUDEngine {
   }
 
   // TODO: Make this function also work for binary data.
-  update(tableName: string, primaryKey: string, changes: Object): Promise<string> {
-    return this.resolvePath(tableName, primaryKey)
-      .then(file => {
-        return this.read(tableName, primaryKey)
-          .then((record: any) => {
-            if (typeof record === 'string') {
-              record = JSON.parse(record);
-            }
-            const updatedRecord: Object = {...record, ...changes};
-            return JSON.stringify(updatedRecord);
-          })
-          .then((updatedRecord: any) => fs.outputFile(file, updatedRecord))
-          .then(() => primaryKey);
-      });
+  update(
+    tableName: string,
+    primaryKey: string,
+    changes: Object
+  ): Promise<string> {
+    return this.resolvePath(tableName, primaryKey).then(file => {
+      return this.read(tableName, primaryKey)
+        .then((record: any) => {
+          if (typeof record === 'string') {
+            record = JSON.parse(record);
+          }
+          const updatedRecord: Object = { ...record, ...changes };
+          return JSON.stringify(updatedRecord);
+        })
+        .then((updatedRecord: any) => fs.outputFile(file, updatedRecord))
+        .then(() => primaryKey);
+    });
   }
 }

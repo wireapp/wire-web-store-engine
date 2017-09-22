@@ -2,7 +2,7 @@
   "author": "Wire",
   "dependencies": {
     "@types/node": "8.0.27",
-    "dexie": "1.5.1",
+    "dexie": "2.0.0",
     "fs-extra": "4.0.1"
   },
   "devDependencies": {

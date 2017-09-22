@@ -16,7 +16,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "lint-staged": "4.1.0",
     "prettier": "1.5.3",
-    "rimraf": "2.6.1",
+    "rimraf": "2.6.2",
     "typescript": "2.4.2",
     "webpack": "3.6.0"
   },

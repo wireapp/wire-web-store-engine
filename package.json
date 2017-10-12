@@ -12,10 +12,10 @@
     "karma": "1.7.1",
     "karma-chrome-launcher": "2.2.0",
     "karma-jasmine": "1.1.0",
-    "karma-jasmine-diff-reporter": "1.1.0",
+    "karma-jasmine-diff-reporter": "1.1.1",
     "karma-sourcemap-loader": "0.3.7",
     "lint-staged": "4.2.3",
-    "prettier": "1.5.3",
+    "prettier": "1.7.4",
     "rimraf": "2.6.2",
     "typescript": "2.4.2",
     "webpack": "3.6.0"

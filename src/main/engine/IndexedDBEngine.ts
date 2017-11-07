@@ -25,7 +25,9 @@ export default class IndexedDBEngine implements CRUDEngine {
   }
 
   public delete(tableName: string, primaryKey: string): Promise<string> {
-    return Promise.resolve().then(() => this.db[tableName].delete(primaryKey)).then(() => primaryKey);
+    return Promise.resolve()
+      .then(() => this.db[tableName].delete(primaryKey))
+      .then(() => primaryKey);
   }
 
   public deleteAll(tableName: string): Promise<boolean> {

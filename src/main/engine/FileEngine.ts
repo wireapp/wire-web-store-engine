@@ -55,7 +55,10 @@ export default class FileEngine implements CRUDEngine {
             fs.writeFile(file, entity, {flag: 'wx'}, error => {
               if (error) {
                 if (error.code === 'ENOENT') {
-                  fs.outputFile(file, entity).then(() => resolve(primaryKey)).catch(error => reject(error));
+                  fs
+                    .outputFile(file, entity)
+                    .then(() => resolve(primaryKey))
+                    .catch(error => reject(error));
                 } else if (error.code === 'EEXIST') {
                   const message: string = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
                   reject(new RecordAlreadyExistsError(message));
@@ -77,13 +80,19 @@ export default class FileEngine implements CRUDEngine {
 
   delete(tableName: string, primaryKey: string): Promise<string> {
     return this.resolvePath(tableName, primaryKey).then(file => {
-      return fs.remove(file).then(() => primaryKey).catch(() => false);
+      return fs
+        .remove(file)
+        .then(() => primaryKey)
+        .catch(() => false);
     });
   }
 
   deleteAll(tableName: string): Promise<boolean> {
     return this.resolvePath(tableName).then(directory => {
-      return fs.remove(directory).then(() => true).catch(() => false);
+      return fs
+        .remove(directory)
+        .then(() => true)
+        .catch(() => false);
     });
   }
 
@@ -119,7 +128,7 @@ export default class FileEngine implements CRUDEngine {
             reject(error);
           } else {
             const recordNames = files.map(file => path.basename(file, path.extname(file)));
-            const promises = recordNames.map(primaryKey => this.read(tableName, primaryKey));
+            const promises: Array<Promise<T>> = recordNames.map(primaryKey => this.read(tableName, primaryKey));
             Promise.all(promises).then((records: T[]) => resolve(records));
           }
         });

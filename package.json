@@ -1,5 +1,4 @@
 {
-  "author": "Wire",
   "dependencies": {
     "@types/node": "8.0.47",
     "dexie": "2.0.1",
@@ -21,6 +20,9 @@
     "webpack": "3.8.1"
   },
   "description": "Provider for different storage engines.",
+  "files": [
+    "dist"
+  ],
   "license": "GPL-3.0",
   "main": "./dist/commonjs/index.js",
   "name": "@wireapp/store-engine",

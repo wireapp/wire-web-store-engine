@@ -32,9 +32,18 @@ export default class FileEngine implements CRUDEngine {
         return reject(new PathValidationError(PathValidationError.TYPE.PATH_TRAVERSAL));
       }
 
-      return resolve(
-        path.join(this.storeName, tableName, primaryKey ? `${primaryKey}${this.options.fileExtension}` : ''),
+      const filePath = path.join(
+        this.storeName,
+        tableName,
+        primaryKey ? `${primaryKey}${this.options.fileExtension}` : '',
       );
+      const nonPrintableCharacters = new RegExp('[^\x20-\x7E]+', 'gm');
+
+      if (filePath.match(nonPrintableCharacters)) {
+        return reject(new PathValidationError(PathValidationError.TYPE.INVALID_NAME));
+      }
+
+      return resolve(filePath);
     });
   }
 
@@ -42,7 +51,7 @@ export default class FileEngine implements CRUDEngine {
     return new Promise((resolve, reject) => {
       if (entity) {
         this.resolvePath(tableName, primaryKey)
-          .then(file => {
+          .then((filePath: string) => {
             // TODO: Implement "base64" serialization to save any kind of data.
             if (typeof entity === 'object') {
               try {
@@ -52,11 +61,11 @@ export default class FileEngine implements CRUDEngine {
               }
             }
 
-            fs.writeFile(file, entity, {flag: 'wx'}, error => {
+            fs.writeFile(filePath, entity, {flag: 'wx'}, error => {
               if (error) {
                 if (error.code === 'ENOENT') {
                   fs
-                    .outputFile(file, entity)
+                    .outputFile(filePath, entity)
                     .then(() => resolve(primaryKey))
                     .catch(error => reject(error));
                 } else if (error.code === 'EEXIST') {

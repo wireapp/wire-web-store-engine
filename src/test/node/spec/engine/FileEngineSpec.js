@@ -109,6 +109,24 @@ describe('StoreEngine.FileEngine', () => {
         done();
       });
     });
+
+    it('does not work when non-printable characters are being used in the store name', (done) => {
+      engine = new StoreEngine.FileEngine(path.join(process.cwd(), '.tmp', 'wrong\t'));
+
+      const PRIMARY_KEY = 'primary-key';
+
+      const entity = {
+        some: 'value'
+      };
+
+      engine.create(TABLE_NAME, PRIMARY_KEY, entity)
+        .then(() => done.fail(new Error('Method is supposed to throw an error.')))
+        .catch((error) => {
+          expect(error.name).toBe(StoreEngine.error.PathValidationError.name);
+          expect(error.message).toBe(StoreEngine.error.PathValidationError.TYPE.INVALID_NAME);
+          done();
+        });
+    });
   });
 
   describe('"delete"', () => {

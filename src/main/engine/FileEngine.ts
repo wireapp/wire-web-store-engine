@@ -137,7 +137,7 @@ export default class FileEngine implements CRUDEngine {
             reject(error);
           } else {
             const recordNames = files.map(file => path.basename(file, path.extname(file)));
-            const promises = recordNames.map(primaryKey => this.read(tableName, primaryKey));
+            const promises: Array<Promise<T>> = recordNames.map(primaryKey => this.read(tableName, primaryKey));
             Promise.all(promises).then((records: T[]) => resolve(records));
           }
         });
